@@ -25,7 +25,7 @@ public class ControllerExceptionHandler {
     @ResponseBody
     public CommonResp<Exception> exceptionHandler(Exception e) {
         CommonResp<Exception> commonResp = new CommonResp<>();
-        LOG.error("系统异常: ", e);
+        LOG.error("系统异常: {}", e.getMessage());
         commonResp.setSuccess(false);
         commonResp.setMessage("系统异常，请联系管理员");
         return commonResp;
@@ -38,7 +38,7 @@ public class ControllerExceptionHandler {
     @ResponseBody
     public CommonResp<String> businessExceptionHandler(BusinessException exception) {
         CommonResp<String> commonResp = new CommonResp<>();
-        LOG.error("业务异常: ",exception);
+        LOG.error("业务异常: {}",exception.getBusinessExceptionEnum().getDesc());
         commonResp.setSuccess(false);
         commonResp.setMessage(exception.getBusinessExceptionEnum().getDesc());
         return commonResp;
@@ -51,9 +51,10 @@ public class ControllerExceptionHandler {
     @ResponseBody
     public CommonResp<String> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException exception) {
         CommonResp<String> commonResp = new CommonResp<>();
-        LOG.error("参数绑定异常: ",exception);
+        String defaultMessage = Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage();
+        LOG.error("参数绑定异常: {}",defaultMessage);
         commonResp.setSuccess(false);
-        commonResp.setMessage(Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
+        commonResp.setMessage(defaultMessage);
         return commonResp;
     }
 
