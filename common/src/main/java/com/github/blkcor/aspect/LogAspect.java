@@ -79,22 +79,16 @@ public class LogAspect {
     @Around("controllerPointcut()")
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
-        Object result = null;
+        Object result = joinPoint.proceed();
         String[] excludeFields = {"mobile"};
-        try {
-            result = joinPoint.proceed();
-        } catch (Throwable throwable) {
-            LOG.error("异常信息:{}", throwable.getMessage());
-            throw throwable;
-        } finally {
-            //返回结果也需要过滤敏感字段
-            PropertyPreFilters propertyPreFilters = new PropertyPreFilters();
-            PropertyPreFilters.MySimplePropertyPreFilter excludeFilter = propertyPreFilters.addFilter();
-            excludeFilter.addExcludes(excludeFields);
-            //打印出参日志
-            LOG.info("返回结果:{}", JSONObject.toJSONString(result, excludeFilter));
-            LOG.info("===============结束 耗时：{} ms===============", System.currentTimeMillis() - startTime);
-        }
+        //返回结果也需要过滤敏感字段
+        PropertyPreFilters propertyPreFilters = new PropertyPreFilters();
+        PropertyPreFilters.MySimplePropertyPreFilter excludeFilter = propertyPreFilters.addFilter();
+        excludeFilter.addExcludes(excludeFields);
+        //打印出参日志
+        LOG.info("返回结果:{}", JSONObject.toJSONString(result, excludeFilter));
+        LOG.info("===============结束 耗时：{} ms===============", System.currentTimeMillis() - startTime);
+
         return result;
-    }
+}
 }

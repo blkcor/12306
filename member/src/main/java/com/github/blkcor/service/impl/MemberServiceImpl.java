@@ -3,6 +3,8 @@ package com.github.blkcor.service.impl;
 
 import com.github.blkcor.entity.Member;
 import com.github.blkcor.entity.MemberExample;
+import com.github.blkcor.exception.BusinessException;
+import com.github.blkcor.exception.BusinessExceptionEnum;
 import com.github.blkcor.mapper.MemberMapper;
 import com.github.blkcor.req.MemberRegisterReq;
 import com.github.blkcor.resp.CommonResp;
@@ -22,7 +24,7 @@ public class MemberServiceImpl implements MemberService {
         memberExample.createCriteria().andMobileEqualTo(memberRegisterReq.getMobile());
         long count = memberMapper.countByExample(memberExample);
         if (count > 0) {
-            throw new RuntimeException("该用户已经注册");
+            throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_EXIST);
         }
         //注册
         Member member = new Member();
