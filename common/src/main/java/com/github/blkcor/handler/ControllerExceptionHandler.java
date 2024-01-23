@@ -2,13 +2,15 @@ package com.github.blkcor.handler;
 
 
 import com.github.blkcor.exception.BusinessException;
-import com.github.blkcor.exception.BusinessExceptionEnum;
 import com.github.blkcor.resp.CommonResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.Objects;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
@@ -26,7 +28,6 @@ public class ControllerExceptionHandler {
         LOG.error("系统异常: ", e);
         commonResp.setSuccess(false);
         commonResp.setMessage("系统异常，请联系管理员");
-        commonResp.setContent(e);
         return commonResp;
     }
 
@@ -42,5 +43,19 @@ public class ControllerExceptionHandler {
         commonResp.setMessage(exception.getBusinessExceptionEnum().getDesc());
         return commonResp;
     }
+
+    /**
+     * 参数绑定异常统一处理
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
+    public CommonResp<String> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException exception) {
+        CommonResp<String> commonResp = new CommonResp<>();
+        LOG.error("参数绑定异常: ",exception);
+        commonResp.setSuccess(false);
+        commonResp.setMessage(Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage());
+        return commonResp;
+    }
+
 
 }
