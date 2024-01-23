@@ -6,14 +6,15 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="train-12306" />
+        <module name="train-member" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="17" />
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="train-12306" options="-parameters" />
+      <module name="train-12306" options="" />
+      <module name="train-member" options="-parameters" />
     </option>
   </component>
 </project>
