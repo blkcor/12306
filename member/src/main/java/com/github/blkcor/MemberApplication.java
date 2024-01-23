@@ -8,11 +8,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 @SpringBootApplication(scanBasePackages = "com.github.blkcor")
-public class TrainMemberApplication {
-    private static final Logger LOG = LoggerFactory.getLogger(TrainMemberApplication.class);
+public class MemberApplication {
+    private static final Logger LOG = LoggerFactory.getLogger(MemberApplication.class);
 
     public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(TrainMemberApplication.class);
+        SpringApplication app = new SpringApplication(MemberApplication.class);
         ConfigurableEnvironment environment = app.run(args).getEnvironment();
         LOG.info("启动成功!");
         LOG.info("地址: \thttp://127.0.0.1:{}", environment.getProperty("server.port"));

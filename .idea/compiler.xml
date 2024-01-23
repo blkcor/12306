@@ -7,8 +7,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="common" />
+        <module name="member" />
         <module name="gateway" />
-        <module name="train-member" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="17" />
@@ -17,8 +17,8 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="common" options="-parameters" />
       <module name="gateway" options="-parameters" />
+      <module name="member" options="-parameters" />
       <module name="train-12306" options="" />
-      <module name="train-member" options="-parameters" />
     </option>
   </component>
 </project>

@@ -1,7 +1,8 @@
 server:
   port: 8888
   servlet:
-    context-path: /train-member
+    context-path: /member
+    application-display-name: member-service
 spring:
   output:
     ansi:

@@ -8,7 +8,7 @@
     </parent>
 
     <groupId>com.github.blkcor</groupId>
-    <artifactId>train-member</artifactId>
+    <artifactId>member</artifactId>
     <packaging>jar</packaging>
 
     <name>train-member</name>

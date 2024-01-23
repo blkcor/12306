@@ -1,9 +1,13 @@
-server:
-  port: 8889
-  servlet:
-    context-path: /train-member
 spring:
   output:
     ansi:
       enabled: always
-
+  cloud:
+    gateway:
+      routes[0]:
+        id: member-service
+        uri: http://localhost:8888
+        predicates[0]: Path=/member/**
+# 路由转发 将/member/** 转发到 member模块
+server:
+  port: 9999

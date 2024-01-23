@@ -15,7 +15,7 @@
     <name>train-12306</name>
     <description>train-12306</description>
     <modules>
-        <module>train-member</module>
+        <module>member</module>
         <module>common</module>
         <module>gateway</module>
     </modules>

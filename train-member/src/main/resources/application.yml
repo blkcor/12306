@@ -1,9 +1,0 @@
-server:
-  port: 8888
-  servlet:
-    context-path: /train-member
-spring:
-  output:
-    ansi:
-      enabled: always
-
