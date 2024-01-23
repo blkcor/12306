@@ -11,8 +11,8 @@
     <artifactId>member</artifactId>
     <packaging>jar</packaging>
 
-    <name>train-member</name>
-    <url>http://maven.apache.org</url>
+    <name>member</name>
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
