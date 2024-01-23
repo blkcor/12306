@@ -1,5 +1,9 @@
 package com.github.blkcor.service;
+
+import com.github.blkcor.req.MemberRegisterReq;
+import com.github.blkcor.resp.CommonResp;
+
 public interface MemberService {
-    Long register(String mobile);
+    CommonResp<Long> register(MemberRegisterReq memberRegisterReq);
 
 }

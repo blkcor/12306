@@ -1,8 +1,11 @@
 package com.github.blkcor.controller;
 
+import com.github.blkcor.req.MemberRegisterReq;
+import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.service.MemberService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,8 +17,8 @@ public class AuthController {
     private MemberService memberService;
 
     @PostMapping("/register")
-    public Long register(String mobile) {
-        return memberService.register(mobile);
+    public CommonResp<Long> register(@RequestBody MemberRegisterReq memberRegisterReq) {
+        return memberService.register(memberRegisterReq);
     }
 
 }

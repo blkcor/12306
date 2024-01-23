@@ -78,7 +78,8 @@
         </sqlMapGenerator>
 
         <!-- 生成 XxxMapper.java 接口-->
-        <javaClientGenerator targetPackage="com.github.blkcor.mapper" targetProject="../member/src/main/java" type="XMLMAPPER">
+        <javaClientGenerator targetPackage="com.github.blkcor.mapper" targetProject="../member/src/main/java"
+                             type="XMLMAPPER">
             <!--<property name="enableSubPackages" value="false"/>-->
         </javaClientGenerator>
 
