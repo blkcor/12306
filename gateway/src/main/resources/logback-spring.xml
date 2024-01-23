@@ -17,7 +17,7 @@
 
     <!-- 配置日志文件保存位置 -->
     <!-- 方式一：直接本配置文件配置，name的值是变量的名称，value的值时变量定义的值。通过定义的值会被插入到logger上下文中。定义后，可以使“${}”来使用变量。 -->
-    <property name="logging.path" value="./log/member"/>
+    <property name="logging.path" value="./log/gateway"/>
     <!-- 方式二：properties配置文件定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径。resource指定配置文件，source配置文件内参数key -->
     <!--  <property resource="application.properties"/>
      <springProperty scope="context" name="LOG_PATH" source="kjcc.loggingPath"/>
@@ -241,23 +241,23 @@
         level:用来设置打印级别，大小写无关：TRACE, DEBUG, INFO, WARN, ERROR, ALL 和OFF，还有一个特俗值INHERITED或者同义词NULL，代表强制执行上级的级别。如果未设置此属性，那么当前logger将会继承上级的级别。
         addtivity:是否向上级logger传递打印信息。默认是true。
     -->
-<!--    <logger name="springfox.documentation.spring" level="error"/>-->
-<!--    <logger name="org.springframework" level="error"/>-->
-<!--    <logger name="tk.mybatis.mapper.autoconfigure" level="error"/>-->
-<!--    <logger name="org.mybatis.spring.mapper" level="debug"/>-->
-<!--    <logger name="org.apache" level="error"/>-->
-<!--    <logger name="org.hibernate" level="error"/>-->
-<!--    <logger name="com.alibaba" level="error"/>-->
-<!--    <logger name="org.activiti.engine.impl.asyncexecutor" level="error"/>-->
-<!--    &lt;!&ndash; show sql of activiti. &ndash;&gt;-->
-<!--    <logger name="org.activiti.engine.impl.persistence.entity" level="error"/>-->
+    <!--    <logger name="springfox.documentation.spring" level="error"/>-->
+    <!--    <logger name="org.springframework" level="error"/>-->
+    <!--    <logger name="tk.mybatis.mapper.autoconfigure" level="error"/>-->
+    <!--    <logger name="org.mybatis.spring.mapper" level="debug"/>-->
+    <!--    <logger name="org.apache" level="error"/>-->
+    <!--    <logger name="org.hibernate" level="error"/>-->
+    <!--    <logger name="com.alibaba" level="error"/>-->
+    <!--    <logger name="org.activiti.engine.impl.asyncexecutor" level="error"/>-->
+    <!--    &lt;!&ndash; show sql of activiti. &ndash;&gt;-->
+    <!--    <logger name="org.activiti.engine.impl.persistence.entity" level="error"/>-->
 
-<!--    <logger name="net.cnki.modules.dao" level="debug" additivity="false">-->
-<!--        <appender-ref ref="CONSOLE" />-->
-<!--    </logger>-->
-<!--    <logger name="net.cnki.security" level="error" additivity="false">-->
-<!--        <appender-ref ref="CONSOLE" />-->
-<!--    </logger>-->
+    <!--    <logger name="net.cnki.modules.dao" level="debug" additivity="false">-->
+    <!--        <appender-ref ref="CONSOLE" />-->
+    <!--    </logger>-->
+    <!--    <logger name="net.cnki.security" level="error" additivity="false">-->
+    <!--        <appender-ref ref="CONSOLE" />-->
+    <!--    </logger>-->
 
 
     <!--
