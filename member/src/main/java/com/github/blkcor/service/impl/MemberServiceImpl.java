@@ -1,6 +1,7 @@
 package com.github.blkcor.service.impl;
 
 
+import cn.hutool.core.util.IdUtil;
 import com.github.blkcor.entity.Member;
 import com.github.blkcor.entity.MemberExample;
 import com.github.blkcor.exception.BusinessException;
@@ -28,7 +29,7 @@ public class MemberServiceImpl implements MemberService {
         }
         //注册
         Member member = new Member();
-        member.setId(System.currentTimeMillis());
+        member.setId(IdUtil.createSnowflake(1, 1).nextId());
         member.setMobile(memberRegisterReq.getMobile());
         memberMapper.insertSelective(member);
         return CommonResp.success(member.getId());
