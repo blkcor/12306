@@ -35,7 +35,7 @@ public class LogAspect {
     /**
      * 定义Pointcut
      */
-    @Pointcut("execution(public * com.github.blkcor.controller..*.*(..))")
+    @Pointcut("execution(public * com.github.blkcor..*Controller.*(..))")
     public void controllerPointcut() {
     }
 
