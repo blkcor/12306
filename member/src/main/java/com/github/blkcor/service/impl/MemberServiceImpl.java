@@ -38,7 +38,7 @@ public class MemberServiceImpl implements MemberService {
         }
         //注册
         Member member = new Member();
-        member.setId(IdUtil.createSnowflake(1, 1).nextId());
+        member.setId(IdUtil.getSnowflake(1, 1).nextId());
         member.setMobile(memberRegisterReq.getMobile());
         memberMapper.insertSelective(member);
         return CommonResp.success(member.getId());
@@ -55,7 +55,7 @@ public class MemberServiceImpl implements MemberService {
         }
         //如果没有被注册，需要插入一条记录
         Member member = new Member();
-        member.setId(IdUtil.createSnowflake(1, 1).nextId());
+        member.setId(IdUtil.getSnowflake(1, 1).nextId());
         member.setMobile(memberSendCodeReq.getMobile());
         memberMapper.insertSelective(member);
 
