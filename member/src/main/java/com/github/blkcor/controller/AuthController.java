@@ -1,8 +1,10 @@
 package com.github.blkcor.controller;
 
+import com.github.blkcor.req.MemberLoginReq;
 import com.github.blkcor.req.MemberRegisterReq;
 import com.github.blkcor.req.MemberSendCodeReq;
 import com.github.blkcor.resp.CommonResp;
+import com.github.blkcor.resp.MemberLoginResp;
 import com.github.blkcor.service.MemberService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -28,4 +30,8 @@ public class AuthController {
         return memberService.sendCode(memberSendCodeReq);
     }
 
+    @PostMapping("/login")
+    public CommonResp<MemberLoginResp> sendCode(@RequestBody @Valid MemberLoginReq memberLoginReq) {
+        return memberService.login(memberLoginReq);
+    }
 }
