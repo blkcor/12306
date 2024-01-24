@@ -1,6 +1,7 @@
 package com.github.blkcor.controller;
 
 import com.github.blkcor.req.MemberRegisterReq;
+import com.github.blkcor.req.MemberSendCodeReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.service.MemberService;
 import jakarta.annotation.Resource;
@@ -20,6 +21,11 @@ public class AuthController {
     @PostMapping("/register")
     public CommonResp<Long> register(@RequestBody @Valid MemberRegisterReq memberRegisterReq) {
         return memberService.register(memberRegisterReq);
+    }
+
+    @PostMapping("/sendCode")
+    public CommonResp<Integer> sendCode(@RequestBody @Valid MemberSendCodeReq memberSendCodeReq) {
+        return memberService.sendCode(memberSendCodeReq);
     }
 
 }
