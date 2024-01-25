@@ -13,6 +13,7 @@ import com.github.blkcor.req.PassengerSaveReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PassengerQueryResp;
 import com.github.blkcor.service.PassengerService;
+import com.github.pagehelper.PageHelper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +44,8 @@ public class PassengerServiceImpl implements PassengerService {
         if(ObjectUtil.isNotNull(passengerQueryReq.getMemberId())){
             criteria.andMemberIdEqualTo(passengerQueryReq.getMemberId());
         }
+        PageHelper.startPage(1,2);
         List<Passenger> passengers = passengerMapper.selectByExample(passengerExample);
-        List<PassengerQueryResp> list = BeanUtil.copyToList(passengers, PassengerQueryResp.class);
-        return CommonResp.success(list);
+        return CommonResp.success(BeanUtil.copyToList(passengers, PassengerQueryResp.class));
     }
 }
