@@ -6,7 +6,6 @@ import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.PassengerQueryResp;
 
-import java.util.List;
 
 public interface PassengerService {
     /**
@@ -22,4 +21,12 @@ public interface PassengerService {
      * @return 返回结果
      */
     CommonResp<PageResp<PassengerQueryResp>> queryPassengerList(PassengerQueryReq passengerQueryReq);
+
+
+    /**
+     * 删除乘客信息
+     * @param id 乘客id
+     * @return 返回结果
+     */
+    CommonResp<Void> deletePassenger(Long id);
 }

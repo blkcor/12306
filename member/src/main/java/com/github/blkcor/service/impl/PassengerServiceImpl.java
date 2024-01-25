@@ -70,4 +70,10 @@ public class PassengerServiceImpl implements PassengerService {
         passengerQueryRespPageResp.setTotal(pageInfo.getTotal());
         return CommonResp.success(passengerQueryRespPageResp);
     }
+
+    @Override
+    public CommonResp<Void> deletePassenger(Long id) {
+        passengerMapper.deleteByPrimaryKey(id);
+        return CommonResp.success(null);
+    }
 }

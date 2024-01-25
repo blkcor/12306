@@ -11,7 +11,6 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/passenger")
@@ -33,5 +32,10 @@ public class PassengerController {
     @PutMapping("/update")
     public CommonResp<Void> updatePassenger(@RequestBody @Valid PassengerSaveReq passengerSaveReq) {
         return passengerService.savePassenger(passengerSaveReq);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public CommonResp<Void> deletePassenger(@PathVariable Long id) {
+        return passengerService.deletePassenger(id);
     }
 }
