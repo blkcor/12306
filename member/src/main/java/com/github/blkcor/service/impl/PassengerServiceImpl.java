@@ -33,11 +33,16 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     public CommonResp<Void> savePassenger(PassengerSaveReq passengerSaveReq) {
         Passenger passenger  = BeanUtil.copyProperties(passengerSaveReq, Passenger.class);
-        passenger.setMemberId(LoginMemberContext.getId());
-        passenger.setCreateTime(DateTime.now());
-        passenger.setUpdateTime(DateTime.now());
-        passenger.setId(IdUtil.getSnowflake(1,1).nextId());
-        passengerMapper.insertSelective(passenger);
+        if(ObjectUtil.isNull(passenger.getId())){
+            passenger.setMemberId(LoginMemberContext.getId());
+            passenger.setCreateTime(DateTime.now());
+            passenger.setUpdateTime(DateTime.now());
+            passenger.setId(IdUtil.getSnowflake(1,1).nextId());
+            passengerMapper.insertSelective(passenger);
+        }else{
+            passenger.setUpdateTime(DateTime.now());
+            passengerMapper.updateByPrimaryKeySelective(passenger);
+        }
         return CommonResp.success(null);
     }
 

@@ -29,4 +29,9 @@ public class PassengerController {
         passengerQueryReq.setMemberId(LoginMemberContext.getId());
         return passengerService.queryPassengerList(passengerQueryReq);
     }
+
+    @PutMapping("/update")
+    public CommonResp<Void> updatePassenger(@RequestBody @Valid PassengerSaveReq passengerSaveReq) {
+        return passengerService.savePassenger(passengerSaveReq);
+    }
 }
