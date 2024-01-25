@@ -6,6 +6,7 @@ import com.github.blkcor.resp.CommonResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -51,7 +52,7 @@ public class ControllerExceptionHandler {
     /**
      * 参数绑定异常统一处理
      */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public CommonResp<String> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException exception) {
@@ -63,5 +64,18 @@ public class ControllerExceptionHandler {
         return commonResp;
     }
 
-
+    /**
+     * 参数绑定异常统一处理
+     */
+    @ExceptionHandler({BindException.class})
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public CommonResp<String> bindExceptionHandler(BindException exception) {
+        CommonResp<String> commonResp = new CommonResp<>();
+        String defaultMessage = Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage();
+        LOG.error("参数绑定异常: {}",defaultMessage);
+        commonResp.setSuccess(false);
+        commonResp.setMessage(defaultMessage);
+        return commonResp;
+    }
 }

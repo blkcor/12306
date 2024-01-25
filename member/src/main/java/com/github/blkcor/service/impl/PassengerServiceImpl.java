@@ -38,13 +38,13 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
-    public CommonResp<List<PassengerQueryResp>> queryPassengerList(PassengerQueryReq passengerQueryReq) {
+    public CommonResp<List<PassengerQueryResp>> queryPassengerList( PassengerQueryReq passengerQueryReq) {
         PassengerExample passengerExample = new PassengerExample();
         PassengerExample.Criteria criteria = passengerExample.createCriteria();
         if(ObjectUtil.isNotNull(passengerQueryReq.getMemberId())){
             criteria.andMemberIdEqualTo(passengerQueryReq.getMemberId());
         }
-        PageHelper.startPage(1,2);
+        PageHelper.startPage(passengerQueryReq.getPage(),passengerQueryReq.getSize());
         List<Passenger> passengers = passengerMapper.selectByExample(passengerExample);
         return CommonResp.success(BeanUtil.copyToList(passengers, PassengerQueryResp.class));
     }
