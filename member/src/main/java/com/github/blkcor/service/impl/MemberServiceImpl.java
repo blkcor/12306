@@ -4,6 +4,8 @@ package com.github.blkcor.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.jwt.JWTUtil;
+import com.github.blkcor.constants.Constants;
 import com.github.blkcor.entity.Member;
 import com.github.blkcor.entity.MemberExample;
 import com.github.blkcor.exception.BusinessException;
@@ -15,10 +17,13 @@ import com.github.blkcor.req.MemberSendCodeReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.MemberLoginResp;
 import com.github.blkcor.service.MemberService;
+import com.github.blkcor.utils.JwtUtil;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -89,7 +94,7 @@ public class MemberServiceImpl implements MemberService {
         //返回会员的信息
         Member member = memberMapper.selectByExample(memberExample).get(0);
         //生成随机的token
-        String token = IdUtil.simpleUUID();
+        String token = JwtUtil.createToken(member.getId(), member.getMobile());
         //TODO: 将token存入redis，key为token，value为用户的id
         MemberLoginResp memberLoginResp = new MemberLoginResp();
         memberLoginResp.setToken(token);
