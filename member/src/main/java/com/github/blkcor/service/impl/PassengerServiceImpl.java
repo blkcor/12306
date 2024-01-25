@@ -11,10 +11,14 @@ import com.github.blkcor.mapper.PassengerMapper;
 import com.github.blkcor.req.PassengerQueryReq;
 import com.github.blkcor.req.PassengerSaveReq;
 import com.github.blkcor.resp.CommonResp;
+import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.PassengerQueryResp;
 import com.github.blkcor.service.PassengerService;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +26,7 @@ import java.util.List;
 
 @Service
 public class PassengerServiceImpl implements PassengerService {
-
+    private static final Logger LOG = LoggerFactory.getLogger(PassengerServiceImpl.class);
     @Resource
     private PassengerMapper passengerMapper;
 
@@ -38,14 +42,27 @@ public class PassengerServiceImpl implements PassengerService {
     }
 
     @Override
-    public CommonResp<List<PassengerQueryResp>> queryPassengerList( PassengerQueryReq passengerQueryReq) {
+    public CommonResp<PageResp<PassengerQueryResp>> queryPassengerList(PassengerQueryReq passengerQueryReq) {
         PassengerExample passengerExample = new PassengerExample();
         PassengerExample.Criteria criteria = passengerExample.createCriteria();
         if(ObjectUtil.isNotNull(passengerQueryReq.getMemberId())){
             criteria.andMemberIdEqualTo(passengerQueryReq.getMemberId());
         }
+
+        LOG.info("查询页码：{}",passengerQueryReq.getPage());
+        LOG.info("查询条数：{}",passengerQueryReq.getSize());
+
         PageHelper.startPage(passengerQueryReq.getPage(),passengerQueryReq.getSize());
         List<Passenger> passengers = passengerMapper.selectByExample(passengerExample);
-        return CommonResp.success(BeanUtil.copyToList(passengers, PassengerQueryResp.class));
+        PageInfo<Passenger> pageInfo = new PageInfo<>(passengers);
+
+        LOG.info("总条数：{}",pageInfo.getTotal());
+        LOG.info("总页数：{}",pageInfo.getPages());
+
+        List<PassengerQueryResp> list = BeanUtil.copyToList(passengers, PassengerQueryResp.class);
+        PageResp<PassengerQueryResp> passengerQueryRespPageResp = new PageResp<>();
+        passengerQueryRespPageResp.setList(list);
+        passengerQueryRespPageResp.setTotal(pageInfo.getTotal());
+        return CommonResp.success(passengerQueryRespPageResp);
     }
 }

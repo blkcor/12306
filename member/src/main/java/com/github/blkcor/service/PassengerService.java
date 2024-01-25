@@ -3,6 +3,7 @@ package com.github.blkcor.service;
 import com.github.blkcor.req.PassengerQueryReq;
 import com.github.blkcor.req.PassengerSaveReq;
 import com.github.blkcor.resp.CommonResp;
+import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.PassengerQueryResp;
 
 import java.util.List;
@@ -20,5 +21,5 @@ public interface PassengerService {
      * @param passengerQueryReq 请求参数
      * @return 返回结果
      */
-    CommonResp<List<PassengerQueryResp>> queryPassengerList(PassengerQueryReq passengerQueryReq);
+    CommonResp<PageResp<PassengerQueryResp>> queryPassengerList(PassengerQueryReq passengerQueryReq);
 }

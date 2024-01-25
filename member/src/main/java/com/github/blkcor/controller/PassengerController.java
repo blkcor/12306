@@ -4,6 +4,7 @@ import com.github.blkcor.context.LoginMemberContext;
 import com.github.blkcor.req.PassengerQueryReq;
 import com.github.blkcor.req.PassengerSaveReq;
 import com.github.blkcor.resp.CommonResp;
+import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.PassengerQueryResp;
 import com.github.blkcor.service.PassengerService;
 import jakarta.annotation.Resource;
@@ -24,7 +25,7 @@ public class PassengerController {
     }
 
     @GetMapping("/query-list")
-    public CommonResp<List<PassengerQueryResp>> queryPassengerList(@Valid PassengerQueryReq passengerQueryReq) {
+    public CommonResp<PageResp<PassengerQueryResp>> queryPassengerList(@Valid PassengerQueryReq passengerQueryReq) {
         passengerQueryReq.setMemberId(LoginMemberContext.getId());
         return passengerService.queryPassengerList(passengerQueryReq);
     }
