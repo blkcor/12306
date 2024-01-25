@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
+import com.github.blkcor.context.LoginMemberContext;
 import com.github.blkcor.entity.Passenger;
 import com.github.blkcor.mapper.PassengerMapper;
 import com.github.blkcor.req.PassengerSaveReq;
@@ -22,6 +23,7 @@ public class PassengerServiceImpl implements PassengerService {
     @Override
     public CommonResp<Void> savePassenger(PassengerSaveReq passengerSaveReq) {
         Passenger passenger  = BeanUtil.copyProperties(passengerSaveReq, Passenger.class);
+        passenger.setMemberId(LoginMemberContext.getId());
         passenger.setCreateTime(DateTime.now());
         passenger.setUpdateTime(DateTime.now());
         passenger.setId(IdUtil.getSnowflake(1,1).nextId());
