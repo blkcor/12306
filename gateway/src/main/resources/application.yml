@@ -2,6 +2,8 @@ spring:
   output:
     ansi:
       enabled: always
+  main:
+    web-application-type: reactive
   cloud:
     gateway:
       routes[0]:

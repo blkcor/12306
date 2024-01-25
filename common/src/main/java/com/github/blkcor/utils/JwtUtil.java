@@ -47,10 +47,15 @@ public class JwtUtil {
     }
 
     public static boolean validToken(String token) {
-        JWT jwt = JWTUtil.parseToken(token).setKey(Constants.KEY.getBytes());
-        boolean verify = jwt.verify();
-        LOG.info("校验token，结果: {}", verify ? "成功" : "失败");
-        return verify;
+        try {
+            JWT jwt = JWTUtil.parseToken(token).setKey(Constants.KEY.getBytes());
+            boolean verify = jwt.verify();
+            LOG.info("校验token，结果: {}", verify ? "成功" : "失败");
+            return verify;
+        } catch (Exception e) {
+            LOG.error("校验token失败，请提供有效的token");
+            return false;
+        }
     }
 
     /**
@@ -60,7 +65,13 @@ public class JwtUtil {
      * @return 原始内容
      */
     public static JSONObject getJSONObject(String token) {
-        JWT jwt = JWTUtil.parseToken(token).setKey(Constants.KEY.getBytes());
+        JWT jwt;
+        try{
+             jwt = JWTUtil.parseToken(token).setKey(Constants.KEY.getBytes());
+        }catch(Exception e){
+            LOG.error("校验token失败，请提供有效的token");;
+            return null;
+        }
         JSONObject payloads = jwt.getPayloads();
         payloads.remove(JWTPayload.ISSUED_AT);
         payloads.remove(JWTPayload.EXPIRES_AT);
@@ -71,7 +82,7 @@ public class JwtUtil {
     }
 
     public static void main(String[] args) {
-        String token = createToken(1L, "18888888888");
+        String token = "ayJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3MDYxNTE1MDksIm1vYmlsZSI6IjE1MjIzMTc1NTg2IiwiaWQiOjEsImV4cCI6MTcwNjIzNzkwOSwiaWF0IjoxNzA2MTUxNTA5fQ.WWChMSHaYQ91NFAeXwmsSLTZFLjHD2PPqUxLxOCs6-A";
         validToken(token);
         getJSONObject(token);
     }
