@@ -14,6 +14,7 @@ import com.github.blkcor.mapper.MemberMapper;
 import com.github.blkcor.req.MemberLoginReq;
 import com.github.blkcor.req.MemberRegisterReq;
 import com.github.blkcor.req.MemberSendCodeReq;
+import com.github.blkcor.req.PassengerSaveReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.MemberLoginResp;
 import com.github.blkcor.service.MemberService;

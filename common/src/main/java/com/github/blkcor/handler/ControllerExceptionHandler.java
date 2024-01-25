@@ -5,10 +5,12 @@ import com.github.blkcor.exception.BusinessException;
 import com.github.blkcor.resp.CommonResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Objects;
 
@@ -23,6 +25,7 @@ public class ControllerExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public CommonResp<Exception> exceptionHandler(Exception e) {
         CommonResp<Exception> commonResp = new CommonResp<>();
         LOG.error("系统异常: {}", e.getMessage());
@@ -36,6 +39,7 @@ public class ControllerExceptionHandler {
      */
     @ExceptionHandler(BusinessException.class)
     @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public CommonResp<String> businessExceptionHandler(BusinessException exception) {
         CommonResp<String> commonResp = new CommonResp<>();
         LOG.error("业务异常: {}",exception.getBusinessExceptionEnum().getDesc());
@@ -49,6 +53,7 @@ public class ControllerExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public CommonResp<String> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException exception) {
         CommonResp<String> commonResp = new CommonResp<>();
         String defaultMessage = Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage();

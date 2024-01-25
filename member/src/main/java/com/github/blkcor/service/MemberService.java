@@ -3,6 +3,7 @@ package com.github.blkcor.service;
 import com.github.blkcor.req.MemberLoginReq;
 import com.github.blkcor.req.MemberRegisterReq;
 import com.github.blkcor.req.MemberSendCodeReq;
+import com.github.blkcor.req.PassengerSaveReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.MemberLoginResp;
 
@@ -27,4 +28,5 @@ public interface MemberService {
      * @return 返回结果
      */
     CommonResp<MemberLoginResp> login(MemberLoginReq memberLoginReq);
+
 }
