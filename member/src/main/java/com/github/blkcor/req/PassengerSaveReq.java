@@ -20,7 +20,6 @@ public class PassengerSaveReq {
     /**
      * 会员id
      */
-    @NotNull(message = "会员id不能为空")
     private Long memberId;
     /**
      * 姓名
