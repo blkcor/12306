@@ -1,5 +1,7 @@
 package com.github.blkcor.server;
 
+import cn.hutool.db.Db;
+import com.github.blkcor.util.DBUtil;
 import com.github.blkcor.util.FreemarkerUtil;
 import freemarker.template.TemplateException;
 import org.dom4j.Document;
@@ -34,17 +36,28 @@ public class ServerGenerator {
         String Domain = domainObjectName.getText();
         String domain = Domain.substring(0, 1).toLowerCase() + Domain.substring(1);
         String do_main = domain.replace("_", "-");
-        HashMap<String, Object> params = new HashMap<>();
-        params.put("Domain", Domain);
-        params.put("do_main", do_main);
-        params.put("domain", domain);
-        params.put("DomainNameCN", domainNameCN);
-        //生成service
-        gen(Domain, params, "service", serverPath, false);
-        //生成serviceImpl
-        gen(Domain, params, "serviceImpl", serverPath, true);
-        //生成controller
-        gen(Domain, params, "controller", serverPath, false);
+        // 4、 获取数据库相关配置
+        Node database = document.selectSingleNode("//jdbcConnection");
+        Node url = database.selectSingleNode("@connectionURL");
+        Node username = database.selectSingleNode("@userId");
+        Node password = database.selectSingleNode("@password");
+        DBUtil.url = url.getText();
+        DBUtil.username = username.getText();
+        DBUtil.password = password.getText();
+        DBUtil.getTableComment(tableName.getText());
+        DBUtil.getColumnsByTableName(tableName.getText());
+//        System.out.println("password：" + password.getText());
+//        HashMap<String, Object> params = new HashMap<>();
+//        params.put("Domain", Domain);
+//        params.put("do_main", do_main);
+//        params.put("domain", domain);
+//        params.put("DomainNameCN", domainNameCN);
+//        //生成service
+//        gen(Domain, params, "service", serverPath, false);
+//        //生成serviceImpl
+//        gen(Domain, params, "serviceImpl", serverPath, true);
+//        //生成controller
+//        gen(Domain, params, "controller", serverPath, false);
     }
 
     private static void gen(String Domain, HashMap<String, Object> params, String target, String targetPath, boolean isImpl) throws IOException, TemplateException {

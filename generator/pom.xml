@@ -23,6 +23,18 @@
             <artifactId>jaxen</artifactId>
             <version>1.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -41,6 +53,10 @@
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
                         <version>8.0.22</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>cn.hutool</groupId>
+                        <artifactId>hutool-all</artifactId>
                     </dependency>
                 </dependencies>
             </plugin>
