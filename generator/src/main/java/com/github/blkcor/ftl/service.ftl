@@ -8,6 +8,7 @@ import com.github.blkcor.resp.${Domain}QueryResp;
 
 
 public interface ${Domain}Service {
+
     /**
      * 保存${DomainNameCN}信息
      * @param ${domain}SaveReq 请求参数

@@ -64,8 +64,10 @@ public class ServerGenerator {
 //        //生成controller
 //        gen(Domain, params, "controller", serverPath, false);
         //生成Req
-        gen(Domain, params, "req", "saveReq", serverPath, false);
-        gen(Domain, params, "req", "queryReq", serverPath, false);
+//        gen(Domain, params, "req", "saveReq", serverPath, false);
+//        gen(Domain, params, "req", "queryReq", serverPath, false);
+        gen(Domain, params, "resp", "queryResp", serverPath, false);
+
     }
 
     private static void gen(String Domain, HashMap<String, Object> params, String packageName, String target, String targetPath, boolean isImpl) throws IOException, TemplateException {
@@ -74,8 +76,8 @@ public class ServerGenerator {
         String Target = target.substring(0, 1).toUpperCase() + target.substring(1);
         String fileName = toPath + Domain + Target + ".java";
         System.out.println("从" + target + ".ftl" + "生成" + fileName);
-//        FreemarkerUtil.generator(fileName, params);
-//        System.out.println(fileName + "：生成成功!");
+        FreemarkerUtil.generator(fileName, params);
+        System.out.println(fileName + "：生成成功!");
     }
 
     private static String getGeneratorPath() throws DocumentException {

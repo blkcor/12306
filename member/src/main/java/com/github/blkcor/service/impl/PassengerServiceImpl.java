@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.github.blkcor.context.LoginMemberContext;
 import com.github.blkcor.entity.Passenger;
 import com.github.blkcor.entity.PassengerExample;
 import com.github.blkcor.mapper.PassengerMapper;
@@ -34,7 +33,6 @@ public class PassengerServiceImpl implements PassengerService {
     public CommonResp<Void> savePassenger(PassengerSaveReq passengerSaveReq) {
         Passenger passenger  = BeanUtil.copyProperties(passengerSaveReq, Passenger.class);
         if(ObjectUtil.isNull(passenger.getId())){
-            passenger.setMemberId(LoginMemberContext.getId());
             passenger.setCreateTime(DateTime.now());
             passenger.setUpdateTime(DateTime.now());
             passenger.setId(IdUtil.getSnowflake(1,1).nextId());
@@ -50,9 +48,6 @@ public class PassengerServiceImpl implements PassengerService {
     public CommonResp<PageResp<PassengerQueryResp>> queryPassengerList(PassengerQueryReq passengerQueryReq) {
         PassengerExample passengerExample = new PassengerExample();
         PassengerExample.Criteria criteria = passengerExample.createCriteria();
-        if(ObjectUtil.isNotNull(passengerQueryReq.getMemberId())){
-            criteria.andMemberIdEqualTo(passengerQueryReq.getMemberId());
-        }
 
         LOG.info("查询页码：{}",passengerQueryReq.getPage());
         LOG.info("查询条数：{}",passengerQueryReq.getSize());
