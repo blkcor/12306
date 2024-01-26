@@ -34,7 +34,7 @@ public class ${Domain}QueryResp {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
         </#if>
     </#if>
-    <#if field.name=='id' || field.javaType=='Long'>
+    <#if field.name=='id' || field.name?ends_with('_id')>
     @JsonSerialize(using = ToStringSerializer.class)
     </#if>
     private ${field.javaType} ${field.nameHump};
