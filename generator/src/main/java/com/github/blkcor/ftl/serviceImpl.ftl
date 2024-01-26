@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.github.blkcor.context.LoginMemberContext;
 import com.github.blkcor.entity.${Domain};
 import com.github.blkcor.entity.${Domain}Example;
 import com.github.blkcor.mapper.${Domain}Mapper;
@@ -34,7 +33,6 @@ public class ${Domain}ServiceImpl implements ${Domain}Service {
     public CommonResp<Void> save${Domain}(${Domain}SaveReq ${domain}SaveReq) {
         ${Domain} ${domain}  = BeanUtil.copyProperties(${domain}SaveReq, ${Domain}.class);
         if(ObjectUtil.isNull(${domain}.getId())){
-            ${domain}.setMemberId(LoginMemberContext.getId());
             ${domain}.setCreateTime(DateTime.now());
             ${domain}.setUpdateTime(DateTime.now());
             ${domain}.setId(IdUtil.getSnowflake(1,1).nextId());
@@ -50,9 +48,6 @@ public class ${Domain}ServiceImpl implements ${Domain}Service {
     public CommonResp<PageResp<${Domain}QueryResp>> query${Domain}List(${Domain}QueryReq ${domain}QueryReq) {
         ${Domain}Example ${domain}Example = new ${Domain}Example();
         ${Domain}Example.Criteria criteria = ${domain}Example.createCriteria();
-        if(ObjectUtil.isNotNull(${domain}QueryReq.getMemberId())){
-            criteria.andMemberIdEqualTo(${domain}QueryReq.getMemberId());
-        }
 
         LOG.info("查询页码：{}",${domain}QueryReq.getPage());
         LOG.info("查询条数：{}",${domain}QueryReq.getSize());
