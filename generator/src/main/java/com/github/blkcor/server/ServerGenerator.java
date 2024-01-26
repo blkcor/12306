@@ -1,7 +1,7 @@
 package com.github.blkcor.server;
 
-import cn.hutool.db.Db;
 import com.github.blkcor.util.DBUtil;
+import com.github.blkcor.util.Field;
 import com.github.blkcor.util.FreemarkerUtil;
 import freemarker.template.TemplateException;
 import org.dom4j.Document;
@@ -11,7 +11,7 @@ import org.dom4j.io.SAXReader;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.*;
 
 public class ServerGenerator {
     static String serverPath = "[module]/src/main/java/com/github/blkcor/";
@@ -44,25 +44,32 @@ public class ServerGenerator {
         DBUtil.url = url.getText();
         DBUtil.username = username.getText();
         DBUtil.password = password.getText();
-        DBUtil.getTableComment(tableName.getText());
-        DBUtil.getColumnsByTableName(tableName.getText());
-//        System.out.println("password：" + password.getText());
-//        HashMap<String, Object> params = new HashMap<>();
-//        params.put("Domain", Domain);
-//        params.put("do_main", do_main);
-//        params.put("domain", domain);
-//        params.put("DomainNameCN", domainNameCN);
-//        //生成service
+        String tableNameCn = DBUtil.getTableComment(tableName.getText());
+        List<Field> fieldList = DBUtil.getColumnsByTableName(tableName.getText());
+        Set<String> javaTypeSet = getJavaTypes(fieldList);
+
+
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("Domain", Domain);
+        params.put("do_main", do_main);
+        params.put("domain", domain);
+        params.put("DomainNameCN", domainNameCN);
+        params.put("tableNameCn", tableNameCn);
+        params.put("fieldList", fieldList);
+        params.put("typeSet", javaTypeSet);
+        //生成service
 //        gen(Domain, params, "service", serverPath, false);
 //        //生成serviceImpl
-//        gen(Domain, params, "serviceImpl", serverPath, true);
+        gen(Domain, params, "service/impl","serviceImpl", serverPath, true);
 //        //生成controller
 //        gen(Domain, params, "controller", serverPath, false);
+        //生成Req
+        gen(Domain, params, "req", "saveReq", serverPath, false);
     }
 
-    private static void gen(String Domain, HashMap<String, Object> params, String target, String targetPath, boolean isImpl) throws IOException, TemplateException {
+    private static void gen(String Domain, HashMap<String, Object> params, String packageName, String target, String targetPath, boolean isImpl) throws IOException, TemplateException {
         FreemarkerUtil.initConfig(target + ".ftl");
-        String toPath = targetPath + target.replace("Impl","")  + (isImpl ? "/impl/" : "/");
+        String toPath = targetPath + packageName + "/";
         String Target = target.substring(0, 1).toUpperCase() + target.substring(1);
         String fileName = toPath + Domain + Target + ".java";
         System.out.println("从" + target + ".ftl" + "生成" + fileName);
@@ -78,5 +85,16 @@ public class ServerGenerator {
         Document document = saxReader.read(pomPath);
         Node node = document.selectSingleNode("//configurationFile");
         return node.getText();
+    }
+
+    /**
+     * 获取java类型，并使用set去重
+     */
+    private static Set<String> getJavaTypes(List<Field> fieldList) {
+        Set<String> set = new HashSet<>();
+        fieldList.forEach(item -> {
+            set.add(item.getJavaType());
+        });
+        return set;
     }
 }
