@@ -1,5 +1,7 @@
 package com.github.blkcor.req;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -38,8 +40,9 @@ public class TrainSaveReq {
     /**
      * 始发时间
      */
-    @NotBlank(message = "始发时间不能为空")
-    private String startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @NotNull(message = "始发时间不能为空")
+    private Date startTime;
     /**
      * 终点站
      */
@@ -53,8 +56,9 @@ public class TrainSaveReq {
     /**
      * 终点时间
      */
-    @NotBlank(message = "终点时间不能为空")
-    private String endTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @NotNull(message = "终点时间不能为空")
+    private Date endTime;
     /**
      * 新增时间
      */
