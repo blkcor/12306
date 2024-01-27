@@ -75,7 +75,7 @@ public class TrainServiceImpl implements TrainService {
     @Override
     public CommonResp<List<TrainQueryResp>> queryAllTrainList() {
         TrainExample trainExample = new TrainExample();
-        trainExample.setOrderByClause("code desc");
+        trainExample.setOrderByClause("code asc");
         List<Train> trains = trainMapper.selectByExample(trainExample);
         List<TrainQueryResp> list = BeanUtil.copyToList(trains, TrainQueryResp.class);
         return CommonResp.success(list);
