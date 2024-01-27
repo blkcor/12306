@@ -44,7 +44,7 @@
                 <artifactId>mybatis-generator-maven-plugin</artifactId>
                 <version>1.4.2</version>
                 <configuration>
-                    <configurationFile>src/main/resources/generator-config-member.xml</configurationFile>
+                    <configurationFile>src/main/resources/generator-config-business.xml</configurationFile>
                     <overwrite>true</overwrite>
                     <verbose>true</verbose>
                 </configuration>
@@ -57,6 +57,7 @@
                     <dependency>
                         <groupId>cn.hutool</groupId>
                         <artifactId>hutool-all</artifactId>
+                        <version>5.8.10</version>
                     </dependency>
                 </dependencies>
             </plugin>

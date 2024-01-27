@@ -27,7 +27,7 @@ public class LoginFilter implements GlobalFilter, Ordered {
         LOG.info("进入Token校验过滤器");
         //放行不需要拦截的请求
         String path = exchange.getRequest().getURI().getPath();
-        if (path.contains("/auth")) {
+        if (path.contains("/auth") || path.contains("/hello")) {
             LOG.info("路径{}不需要进行校验", path);
             return chain.filter(exchange);
         }

@@ -10,6 +10,10 @@ spring:
         id: member-service
         uri: http://localhost:8888
         predicates[0]: Path=/member/**
+      routes[1]:
+        id: business-service
+        uri: http://localhost:8889
+        predicates[0]: Path=/business/**
 # 路由转发 将/member/** 转发到 member模块
 server:
   port: 9999

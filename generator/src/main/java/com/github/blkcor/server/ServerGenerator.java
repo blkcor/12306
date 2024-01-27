@@ -58,14 +58,14 @@ public class ServerGenerator {
         params.put("fieldList", fieldList);
         params.put("typeSet", javaTypeSet);
         //生成service
-//        gen(Domain, params, "service", serverPath, false);
-//        //生成serviceImpl
-        gen(Domain, params, "service/impl","serviceImpl", serverPath, true);
-//        //生成controller
-//        gen(Domain, params, "controller", serverPath, false);
+        gen(Domain, params, "service","service", serverPath, false);
+        //生成serviceImpl
+        gen(Domain, params, "service/impl", "serviceImpl", serverPath, true);
+        //生成controller
+        gen(Domain, params, "controller", "controller",serverPath, false);
         //生成Req
-//        gen(Domain, params, "req", "saveReq", serverPath, false);
-//        gen(Domain, params, "req", "queryReq", serverPath, false);
+        gen(Domain, params, "req", "saveReq", serverPath, false);
+        gen(Domain, params, "req", "queryReq", serverPath, false);
         gen(Domain, params, "resp", "queryResp", serverPath, false);
 
     }
