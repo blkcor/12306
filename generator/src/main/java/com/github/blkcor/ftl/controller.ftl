@@ -1,6 +1,5 @@
 package com.github.blkcor.controller;
 
-import com.github.blkcor.context.LoginMemberContext;
 import com.github.blkcor.req.${Domain}QueryReq;
 import com.github.blkcor.req.${Domain}SaveReq;
 import com.github.blkcor.resp.CommonResp;
@@ -25,7 +24,6 @@ public class ${Domain}Controller {
 
     @GetMapping("/query-list")
     public CommonResp<PageResp<${Domain}QueryResp>> query${Domain}List(@Valid ${Domain}QueryReq ${domain}QueryReq) {
-        ${domain}QueryReq.setMemberId(LoginMemberContext.getId());
         return ${domain}Service.query${Domain}List(${domain}QueryReq);
     }
 

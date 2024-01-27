@@ -58,11 +58,11 @@ public class ServerGenerator {
         params.put("fieldList", fieldList);
         params.put("typeSet", javaTypeSet);
         //生成service
-        gen(Domain, params, "service","service", serverPath, false);
+        gen(Domain, params, "service", "service", serverPath, false);
         //生成serviceImpl
         gen(Domain, params, "service/impl", "serviceImpl", serverPath, true);
         //生成controller
-        gen(Domain, params, "controller", "controller",serverPath, false);
+        gen(Domain, params, "controller", "controller", serverPath, false);
         //生成Req
         gen(Domain, params, "req", "saveReq", serverPath, false);
         gen(Domain, params, "req", "queryReq", serverPath, false);
@@ -73,6 +73,8 @@ public class ServerGenerator {
     private static void gen(String Domain, HashMap<String, Object> params, String packageName, String target, String targetPath, boolean isImpl) throws IOException, TemplateException {
         FreemarkerUtil.initConfig(target + ".ftl");
         String toPath = targetPath + packageName + "/";
+        //生成目标文件夹
+        new File(toPath).mkdirs();
         String Target = target.substring(0, 1).toUpperCase() + target.substring(1);
         String fileName = toPath + Domain + Target + ".java";
         System.out.println("从" + target + ".ftl" + "生成" + fileName);
