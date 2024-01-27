@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.blkcor.mapper.TrainCarriageMapper">
-  <resultMap id="BaseResultMap" type="com.github.blkcor.entity.TrainCarriage">
+<mapper namespace="com.github.blkcor.mapper.TrainSeatMapper">
+  <resultMap id="BaseResultMap" type="com.github.blkcor.entity.TrainSeat">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="train_code" jdbcType="VARCHAR" property="trainCode" />
-    <result column="index" jdbcType="INTEGER" property="index" />
+    <result column="carriage_index" jdbcType="INTEGER" property="carriageIndex" />
+    <result column="row" jdbcType="CHAR" property="row" />
+    <result column="col" jdbcType="CHAR" property="col" />
     <result column="seat_type" jdbcType="VARCHAR" property="seatType" />
-    <result column="seat_count" jdbcType="INTEGER" property="seatCount" />
-    <result column="row_count" jdbcType="INTEGER" property="rowCount" />
-    <result column="col_count" jdbcType="INTEGER" property="colCount" />
+    <result column="carriage_seat_index" jdbcType="INTEGER" property="carriageSeatIndex" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
@@ -71,17 +71,17 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, train_code, `index`, seat_type, seat_count, `row_count`, col_count, create_time, 
+    id, train_code, carriage_index, `row`, col, seat_type, carriage_seat_index, create_time, 
     update_time
   </sql>
-  <select id="selectByExample" parameterType="com.github.blkcor.entity.TrainCarriageExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.github.blkcor.entity.TrainSeatExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     'true' as QUERYID,
     <include refid="Base_Column_List" />
-    from train_carriage
+    from train_seat
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -92,31 +92,29 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from train_carriage
+    from train_seat
     where id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from train_carriage
+    delete from train_seat
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <delete id="deleteByExample" parameterType="com.github.blkcor.entity.TrainCarriageExample">
-    delete from train_carriage
+  <delete id="deleteByExample" parameterType="com.github.blkcor.entity.TrainSeatExample">
+    delete from train_seat
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.github.blkcor.entity.TrainCarriage">
-    insert into train_carriage (id, train_code, `index`, 
-      seat_type, seat_count, `row_count`, 
-      col_count, create_time, update_time
-      )
-    values (#{id,jdbcType=BIGINT}, #{trainCode,jdbcType=VARCHAR}, #{index,jdbcType=INTEGER}, 
-      #{seatType,jdbcType=VARCHAR}, #{seatCount,jdbcType=INTEGER}, #{rowCount,jdbcType=INTEGER}, 
-      #{colCount,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+  <insert id="insert" parameterType="com.github.blkcor.entity.TrainSeat">
+    insert into train_seat (id, train_code, carriage_index, 
+      `row`, col, seat_type, carriage_seat_index, 
+      create_time, update_time)
+    values (#{id,jdbcType=BIGINT}, #{trainCode,jdbcType=VARCHAR}, #{carriageIndex,jdbcType=INTEGER}, 
+      #{row,jdbcType=CHAR}, #{col,jdbcType=CHAR}, #{seatType,jdbcType=VARCHAR}, #{carriageSeatIndex,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.github.blkcor.entity.TrainCarriage">
-    insert into train_carriage
+  <insert id="insertSelective" parameterType="com.github.blkcor.entity.TrainSeat">
+    insert into train_seat
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -124,20 +122,20 @@
       <if test="trainCode != null">
         train_code,
       </if>
-      <if test="index != null">
-        `index`,
+      <if test="carriageIndex != null">
+        carriage_index,
+      </if>
+      <if test="row != null">
+        `row`,
+      </if>
+      <if test="col != null">
+        col,
       </if>
       <if test="seatType != null">
         seat_type,
       </if>
-      <if test="seatCount != null">
-        seat_count,
-      </if>
-      <if test="rowCount != null">
-        `row_count`,
-      </if>
-      <if test="colCount != null">
-        col_count,
+      <if test="carriageSeatIndex != null">
+        carriage_seat_index,
       </if>
       <if test="createTime != null">
         create_time,
@@ -153,20 +151,20 @@
       <if test="trainCode != null">
         #{trainCode,jdbcType=VARCHAR},
       </if>
-      <if test="index != null">
-        #{index,jdbcType=INTEGER},
+      <if test="carriageIndex != null">
+        #{carriageIndex,jdbcType=INTEGER},
+      </if>
+      <if test="row != null">
+        #{row,jdbcType=CHAR},
+      </if>
+      <if test="col != null">
+        #{col,jdbcType=CHAR},
       </if>
       <if test="seatType != null">
         #{seatType,jdbcType=VARCHAR},
       </if>
-      <if test="seatCount != null">
-        #{seatCount,jdbcType=INTEGER},
-      </if>
-      <if test="rowCount != null">
-        #{rowCount,jdbcType=INTEGER},
-      </if>
-      <if test="colCount != null">
-        #{colCount,jdbcType=INTEGER},
+      <if test="carriageSeatIndex != null">
+        #{carriageSeatIndex,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -176,14 +174,14 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.github.blkcor.entity.TrainCarriageExample" resultType="java.lang.Long">
-    select count(*) from train_carriage
+  <select id="countByExample" parameterType="com.github.blkcor.entity.TrainSeatExample" resultType="java.lang.Long">
+    select count(*) from train_seat
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update train_carriage
+    update train_seat
     <set>
       <if test="row.id != null">
         id = #{row.id,jdbcType=BIGINT},
@@ -191,20 +189,20 @@
       <if test="row.trainCode != null">
         train_code = #{row.trainCode,jdbcType=VARCHAR},
       </if>
-      <if test="row.index != null">
-        `index` = #{row.index,jdbcType=INTEGER},
+      <if test="row.carriageIndex != null">
+        carriage_index = #{row.carriageIndex,jdbcType=INTEGER},
+      </if>
+      <if test="row.row != null">
+        `row` = #{row.row,jdbcType=CHAR},
+      </if>
+      <if test="row.col != null">
+        col = #{row.col,jdbcType=CHAR},
       </if>
       <if test="row.seatType != null">
         seat_type = #{row.seatType,jdbcType=VARCHAR},
       </if>
-      <if test="row.seatCount != null">
-        seat_count = #{row.seatCount,jdbcType=INTEGER},
-      </if>
-      <if test="row.rowCount != null">
-        `row_count` = #{row.rowCount,jdbcType=INTEGER},
-      </if>
-      <if test="row.colCount != null">
-        col_count = #{row.colCount,jdbcType=INTEGER},
+      <if test="row.carriageSeatIndex != null">
+        carriage_seat_index = #{row.carriageSeatIndex,jdbcType=INTEGER},
       </if>
       <if test="row.createTime != null">
         create_time = #{row.createTime,jdbcType=TIMESTAMP},
@@ -218,40 +216,40 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update train_carriage
+    update train_seat
     set id = #{row.id,jdbcType=BIGINT},
       train_code = #{row.trainCode,jdbcType=VARCHAR},
-      `index` = #{row.index,jdbcType=INTEGER},
+      carriage_index = #{row.carriageIndex,jdbcType=INTEGER},
+      `row` = #{row.row,jdbcType=CHAR},
+      col = #{row.col,jdbcType=CHAR},
       seat_type = #{row.seatType,jdbcType=VARCHAR},
-      seat_count = #{row.seatCount,jdbcType=INTEGER},
-      `row_count` = #{row.rowCount,jdbcType=INTEGER},
-      col_count = #{row.colCount,jdbcType=INTEGER},
+      carriage_seat_index = #{row.carriageSeatIndex,jdbcType=INTEGER},
       create_time = #{row.createTime,jdbcType=TIMESTAMP},
       update_time = #{row.updateTime,jdbcType=TIMESTAMP}
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.github.blkcor.entity.TrainCarriage">
-    update train_carriage
+  <update id="updateByPrimaryKeySelective" parameterType="com.github.blkcor.entity.TrainSeat">
+    update train_seat
     <set>
       <if test="trainCode != null">
         train_code = #{trainCode,jdbcType=VARCHAR},
       </if>
-      <if test="index != null">
-        `index` = #{index,jdbcType=INTEGER},
+      <if test="carriageIndex != null">
+        carriage_index = #{carriageIndex,jdbcType=INTEGER},
+      </if>
+      <if test="row != null">
+        `row` = #{row,jdbcType=CHAR},
+      </if>
+      <if test="col != null">
+        col = #{col,jdbcType=CHAR},
       </if>
       <if test="seatType != null">
         seat_type = #{seatType,jdbcType=VARCHAR},
       </if>
-      <if test="seatCount != null">
-        seat_count = #{seatCount,jdbcType=INTEGER},
-      </if>
-      <if test="rowCount != null">
-        `row_count` = #{rowCount,jdbcType=INTEGER},
-      </if>
-      <if test="colCount != null">
-        col_count = #{colCount,jdbcType=INTEGER},
+      <if test="carriageSeatIndex != null">
+        carriage_seat_index = #{carriageSeatIndex,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -262,14 +260,14 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.github.blkcor.entity.TrainCarriage">
-    update train_carriage
+  <update id="updateByPrimaryKey" parameterType="com.github.blkcor.entity.TrainSeat">
+    update train_seat
     set train_code = #{trainCode,jdbcType=VARCHAR},
-      `index` = #{index,jdbcType=INTEGER},
+      carriage_index = #{carriageIndex,jdbcType=INTEGER},
+      `row` = #{row,jdbcType=CHAR},
+      col = #{col,jdbcType=CHAR},
       seat_type = #{seatType,jdbcType=VARCHAR},
-      seat_count = #{seatCount,jdbcType=INTEGER},
-      `row_count` = #{rowCount,jdbcType=INTEGER},
-      col_count = #{colCount,jdbcType=INTEGER},
+      carriage_seat_index = #{carriageSeatIndex,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
