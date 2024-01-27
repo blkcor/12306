@@ -97,7 +97,11 @@
 <!--               enableCountByExample="true" enableDeleteByExample="true" enableSelectByExample="true"-->
 <!--               enableUpdateByExample="true" selectByExampleQueryId="true">-->
 <!--        </table>-->
-        <table schema="" tableName="train" domainObjectName="Train"
+<!--        <table schema="" tableName="train" domainObjectName="Train"-->
+<!--               enableCountByExample="true" enableDeleteByExample="true" enableSelectByExample="true"-->
+<!--               enableUpdateByExample="true" selectByExampleQueryId="true">-->
+<!--        </table>-->
+        <table schema="" tableName="train_station" domainObjectName="TrainStation"
                enableCountByExample="true" enableDeleteByExample="true" enableSelectByExample="true"
                enableUpdateByExample="true" selectByExampleQueryId="true">
         </table>
