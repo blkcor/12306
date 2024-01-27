@@ -50,3 +50,20 @@ create table `train_station`
     unique key `train_code_name_unique` (`train_code`, `name`)
 ) engine = InnoDB
   default charset = utf8mb4 comment ='车次车站表';
+
+drop table if exists `train_carriage`;
+create table `train_carriage`
+(
+    `id`          bigint      not null comment 'id',
+    `train_code`  varchar(20) not null comment '车次编号',
+    `index` int not null comment '车厢序号',
+    `seat_type`   varchar(20) not null comment '座位类型|枚举[SeatTypeEnum]',
+    `seat_count`  int         not null comment '座位数量',
+    `row_count`   int         not null comment '行数',
+    `column_count` int        not null comment '列数',
+    `create_time` datetime(3) comment '新增时间',
+    `update_time` datetime(3) comment '更新时间',
+    primary key (`id`),
+    unique key `train_code_index_unique` (`train_code`, `index`)
+) engine = InnoDB
+  default charset = utf8mb4 comment ='车次车厢表';
