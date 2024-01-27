@@ -1,4 +1,4 @@
-package com.github.blkcor.controller;
+package com.github.blkcor.controller.admin;
 
 import com.github.blkcor.req.TrainCarriageQueryReq;
 import com.github.blkcor.req.TrainCarriageSaveReq;
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/trainCarriage")
-public class TrainCarriageController {
+@RequestMapping("/admin/trainCarriage")
+public class AdminTrainCarriageController {
     @Resource
     private TrainCarriageService trainCarriageService;
 

@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 @SpringBootApplication(scanBasePackages = "com.github.blkcor")
-//@MapperScan("com.github.blkcor.mapper")
+@MapperScan("com.github.blkcor.mapper")
 public class BusinessApplication {
     private static final Logger LOG = LoggerFactory.getLogger(BusinessApplication.class);
     public static void main(String[] args) {

@@ -71,4 +71,13 @@ public class TrainServiceImpl implements TrainService {
         trainMapper.deleteByPrimaryKey(id);
         return CommonResp.success(null);
     }
+
+    @Override
+    public CommonResp<List<TrainQueryResp>> queryAllTrainList() {
+        TrainExample trainExample = new TrainExample();
+        trainExample.setOrderByClause("code desc");
+        List<Train> trains = trainMapper.selectByExample(trainExample);
+        List<TrainQueryResp> list = BeanUtil.copyToList(trains, TrainQueryResp.class);
+        return CommonResp.success(list);
+    }
 }

@@ -53,7 +53,7 @@ public class ServerGenerator {
         params.put("Domain", Domain);
         params.put("do_main", do_main);
         params.put("domain", domain);
-        params.put("DomainNameCN", domainNameCN);
+        params.put("DomainNameCN", tableNameCn.replace("表", ""));
         params.put("tableNameCn", tableNameCn);
         params.put("fieldList", fieldList);
         params.put("typeSet", javaTypeSet);
