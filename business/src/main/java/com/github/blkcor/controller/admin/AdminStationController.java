@@ -1,4 +1,4 @@
-package com.github.blkcor.controller;
+package com.github.blkcor.controller.admin;
 
 import com.github.blkcor.req.StationQueryReq;
 import com.github.blkcor.req.StationSaveReq;
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/station")
-public class StationController {
+@RequestMapping("/admin/station")
+public class AdminStationController {
     @Resource
     private StationService stationService;
 
