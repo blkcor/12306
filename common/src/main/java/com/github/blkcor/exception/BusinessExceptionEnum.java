@@ -11,7 +11,15 @@ public enum BusinessExceptionEnum {
 
     MEMBER_CODE_ERROR("验证码错误"),
 
-    BUSINESS_STATION_NAME_UNIQUE_ERROR("车站已存在");
+    BUSINESS_STATION_NAME_UNIQUE_ERROR("车站已存在"),
+
+    BUSINESS_CARRIAGE_CODE_INDEX_UNIQUE_ERROR("车厢号已存在"),
+
+    BUSINESS_TRAIN_CODE_UNIQUE_ERROR("车次已存在"),
+
+    BUSINESS_TRAIN_STATION_INDEX_UNIQUE_ERROR("同车次站序已存在"),
+
+    BUSINESS_TRAIN_STATION_NAME_UNIQUE_ERROR("同车次站名已存在");
 
     private String desc;
 

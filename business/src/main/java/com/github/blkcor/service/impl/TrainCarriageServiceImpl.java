@@ -7,6 +7,8 @@ import cn.hutool.core.util.ObjectUtil;
 import com.github.blkcor.entity.TrainCarriage;
 import com.github.blkcor.entity.TrainCarriageExample;
 import com.github.blkcor.enums.SeatColEnum;
+import com.github.blkcor.exception.BusinessException;
+import com.github.blkcor.exception.BusinessExceptionEnum;
 import com.github.blkcor.mapper.TrainCarriageMapper;
 import com.github.blkcor.req.TrainCarriageQueryReq;
 import com.github.blkcor.req.TrainCarriageSaveReq;
@@ -37,6 +39,13 @@ public class TrainCarriageServiceImpl implements TrainCarriageService {
         trainCarriage.setColCount(colList.size());
         trainCarriage.setSeatCount(trainCarriage.getRowCount() * trainCarriage.getColCount());
         if (ObjectUtil.isNull(trainCarriage.getId())) {
+            //校验车厢是否存在
+            TrainCarriageExample trainCarriageExample = new TrainCarriageExample();
+            trainCarriageExample.createCriteria().andTrainCodeEqualTo(trainCarriageSaveReq.getTrainCode()).andIndexEqualTo(trainCarriageSaveReq.getIndex());
+            long count = trainCarriageMapper.countByExample(trainCarriageExample);
+            if (count != 0) {
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_CARRIAGE_CODE_INDEX_UNIQUE_ERROR);
+            }
             trainCarriage.setCreateTime(DateTime.now());
             trainCarriage.setUpdateTime(DateTime.now());
             trainCarriage.setId(IdUtil.getSnowflake(1, 1).nextId());

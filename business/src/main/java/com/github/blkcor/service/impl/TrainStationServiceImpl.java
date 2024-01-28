@@ -6,6 +6,8 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.blkcor.entity.TrainStation;
 import com.github.blkcor.entity.TrainStationExample;
+import com.github.blkcor.exception.BusinessException;
+import com.github.blkcor.exception.BusinessExceptionEnum;
 import com.github.blkcor.mapper.TrainStationMapper;
 import com.github.blkcor.req.TrainStationQueryReq;
 import com.github.blkcor.req.TrainStationSaveReq;
@@ -31,17 +33,47 @@ public class TrainStationServiceImpl implements TrainStationService {
 
     @Override
     public CommonResp<Void> saveTrainStation(TrainStationSaveReq trainStationSaveReq) {
-        TrainStation trainStation  = BeanUtil.copyProperties(trainStationSaveReq, TrainStation.class);
-        if(ObjectUtil.isNull(trainStation.getId())){
+        TrainStation trainStation = BeanUtil.copyProperties(trainStationSaveReq, TrainStation.class);
+        if (ObjectUtil.isNull(trainStation.getId())) {
+            //校验车次车站信息是否存在(有两个unique_key，所以要判断两次)
+            if (getByTrainCodeAndIndex(trainStation.getTrainCode(), trainStation.getIndex()) != null) {
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_TRAIN_STATION_INDEX_UNIQUE_ERROR);
+            }
+            if (getByTrainCodeAndName(trainStation.getTrainCode(), trainStation.getName()) != null) {
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_STATION_NAME_UNIQUE_ERROR);
+            }
+
             trainStation.setCreateTime(DateTime.now());
             trainStation.setUpdateTime(DateTime.now());
-            trainStation.setId(IdUtil.getSnowflake(1,1).nextId());
+            trainStation.setId(IdUtil.getSnowflake(1, 1).nextId());
             trainStationMapper.insertSelective(trainStation);
-        }else{
+        } else {
             trainStation.setUpdateTime(DateTime.now());
             trainStationMapper.updateByPrimaryKeySelective(trainStation);
         }
         return CommonResp.success(null);
+    }
+
+    private TrainStation getByTrainCodeAndIndex(String trainCode, Integer index) {
+        TrainStationExample trainStationExample = new TrainStationExample();
+        trainStationExample.createCriteria().andTrainCodeEqualTo(trainCode).andIndexEqualTo(index);
+        List<TrainStation> trainStations = trainStationMapper.selectByExample(trainStationExample);
+        if (ObjectUtil.isEmpty(trainStations)) {
+            return null;
+        } else {
+            return trainStations.get(0);
+        }
+    }
+
+    private TrainStation getByTrainCodeAndName(String trainCode, String name) {
+        TrainStationExample trainStationExample = new TrainStationExample();
+        trainStationExample.createCriteria().andTrainCodeEqualTo(trainCode).andNameEqualTo(name);
+        List<TrainStation> trainStations = trainStationMapper.selectByExample(trainStationExample);
+        if (ObjectUtil.isEmpty(trainStations)) {
+            return null;
+        } else {
+            return trainStations.get(0);
+        }
     }
 
     @Override
@@ -49,15 +81,15 @@ public class TrainStationServiceImpl implements TrainStationService {
         TrainStationExample trainStationExample = new TrainStationExample();
         TrainStationExample.Criteria criteria = trainStationExample.createCriteria();
 
-        LOG.info("查询页码：{}",trainStationQueryReq.getPage());
-        LOG.info("查询条数：{}",trainStationQueryReq.getSize());
+        LOG.info("查询页码：{}", trainStationQueryReq.getPage());
+        LOG.info("查询条数：{}", trainStationQueryReq.getSize());
 
-        PageHelper.startPage(trainStationQueryReq.getPage(),trainStationQueryReq.getSize());
+        PageHelper.startPage(trainStationQueryReq.getPage(), trainStationQueryReq.getSize());
         List<TrainStation> trainStations = trainStationMapper.selectByExample(trainStationExample);
         PageInfo<TrainStation> pageInfo = new PageInfo<>(trainStations);
 
-        LOG.info("总条数：{}",pageInfo.getTotal());
-        LOG.info("总页数：{}",pageInfo.getPages());
+        LOG.info("总条数：{}", pageInfo.getTotal());
+        LOG.info("总页数：{}", pageInfo.getPages());
 
         List<TrainStationQueryResp> list = BeanUtil.copyToList(trainStations, TrainStationQueryResp.class);
         PageResp<TrainStationQueryResp> trainStationQueryRespPageResp = new PageResp<>();

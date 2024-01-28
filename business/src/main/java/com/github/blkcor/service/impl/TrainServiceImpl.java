@@ -6,6 +6,8 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.blkcor.entity.Train;
 import com.github.blkcor.entity.TrainExample;
+import com.github.blkcor.exception.BusinessException;
+import com.github.blkcor.exception.BusinessExceptionEnum;
 import com.github.blkcor.mapper.TrainMapper;
 import com.github.blkcor.req.TrainQueryReq;
 import com.github.blkcor.req.TrainSaveReq;
@@ -33,6 +35,13 @@ public class TrainServiceImpl implements TrainService {
     public CommonResp<Void> saveTrain(TrainSaveReq trainSaveReq) {
         Train train  = BeanUtil.copyProperties(trainSaveReq, Train.class);
         if(ObjectUtil.isNull(train.getId())){
+            //校验车次是否存在
+            TrainExample trainExample = new TrainExample();
+            trainExample.createCriteria().andCodeEqualTo(train.getCode());
+            long count = trainMapper.countByExample(trainExample);
+            if(count != 0){
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_TRAIN_CODE_UNIQUE_ERROR);
+            }
             train.setCreateTime(DateTime.now());
             train.setUpdateTime(DateTime.now());
             train.setId(IdUtil.getSnowflake(1,1).nextId());
