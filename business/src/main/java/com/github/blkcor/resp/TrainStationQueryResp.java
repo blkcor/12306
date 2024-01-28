@@ -53,7 +53,7 @@ public class TrainStationQueryResp {
     private Date outTime;
 
     /**
-    * 停留时间
+    * 停留时间(前端自动计算填充)
     */
     @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
     private Date stopTime;
