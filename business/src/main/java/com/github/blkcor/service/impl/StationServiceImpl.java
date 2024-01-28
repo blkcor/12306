@@ -6,6 +6,8 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.blkcor.entity.Station;
 import com.github.blkcor.entity.StationExample;
+import com.github.blkcor.exception.BusinessException;
+import com.github.blkcor.exception.BusinessExceptionEnum;
 import com.github.blkcor.mapper.StationMapper;
 import com.github.blkcor.req.StationQueryReq;
 import com.github.blkcor.req.StationSaveReq;
@@ -33,6 +35,14 @@ public class StationServiceImpl implements StationService {
     public CommonResp<Void> saveStation(StationSaveReq stationSaveReq) {
         Station station  = BeanUtil.copyProperties(stationSaveReq, Station.class);
         if(ObjectUtil.isNull(station.getId())){
+            //校验车站是否存在
+            StationExample stationExample = new StationExample();
+            stationExample.createCriteria().andNameEqualTo(station.getName());
+            long count = stationMapper.countByExample(stationExample);
+            if(count != 0){
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_STATION_NAME_UNIQUE_ERROR);
+            }
+
             station.setCreateTime(DateTime.now());
             station.setUpdateTime(DateTime.now());
             station.setId(IdUtil.getSnowflake(1,1).nextId());
