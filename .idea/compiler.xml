@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="member" />
+        <module name="batch" />
         <module name="generator" />
         <module name="common" />
         <module name="business" />
@@ -17,6 +18,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="batch" options="-parameters" />
       <module name="business" options="-parameters" />
       <module name="common" options="-parameters" />
       <module name="gateway" options="-parameters" />
