@@ -56,6 +56,24 @@ public class JobController {
         return CommonResp.success(null);
     }
 
+    @PostMapping("/run")
+    public CommonResp<Void> runJob(@RequestBody CronJobReq cronJobReq){
+        String jobName = cronJobReq.getName();
+        String jobGroup = cronJobReq.getGroup();
+        LOG.info("立即执行定时任务开始：{} {}", jobName, jobGroup);
+        try {
+            //获得调度器实例
+            Scheduler scheduler = schedulerFactoryBean.getScheduler();
+            //立即执行定时任务
+            scheduler.triggerJob(JobKey.jobKey(jobName, jobGroup));
+        } catch (SchedulerException e) {
+            LOG.error("立即执行定时任务失败：{}", e);
+            return new CommonResp<>(false, "立即执行定时任务失败", null);
+        }
+        LOG.info("立即执行定时任务成功：{} {}", jobName, jobGroup);
+        return CommonResp.success(null);
+    }
+
     @PostMapping("/pause")
     public CommonResp<Void> pauseJob(@RequestBody CronJobReq cronJobReq) {
         String jobName = cronJobReq.getName();
@@ -140,13 +158,13 @@ public class JobController {
     }
 
     @PostMapping("/query")
-    public CommonResp<List<CronJobResp>> queryJob(@RequestBody CronJobReq cronJobReq){
+    public CommonResp<List<CronJobResp>> queryJob(){
         LOG.info("查询定时任务开始");
         List<CronJobResp> cronJobRespList = new ArrayList<>();
         try{
             Scheduler scheduler = schedulerFactoryBean.getScheduler();
             for (String jobGroupName : scheduler.getJobGroupNames()) {
-                scheduler.getJobKeys(GroupMatcher.groupContains(jobGroupName)).forEach(jobKey -> {
+                scheduler.getJobKeys(GroupMatcher.groupEquals(jobGroupName)).forEach(jobKey -> {
                     CronJobResp cronJobResp = new CronJobResp();
                     cronJobResp.setName(jobKey.getName());
                     cronJobResp.setGroup(jobKey.getGroup());
