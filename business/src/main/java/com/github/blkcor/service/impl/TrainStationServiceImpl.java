@@ -40,7 +40,7 @@ public class TrainStationServiceImpl implements TrainStationService {
                 throw new BusinessException(BusinessExceptionEnum.BUSINESS_TRAIN_STATION_INDEX_UNIQUE_ERROR);
             }
             if (getByTrainCodeAndName(trainStation.getTrainCode(), trainStation.getName()) != null) {
-                throw new BusinessException(BusinessExceptionEnum.BUSINESS_STATION_NAME_UNIQUE_ERROR);
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_TRAIN_STATION_NAME_UNIQUE_ERROR);
             }
 
             trainStation.setCreateTime(DateTime.now());
