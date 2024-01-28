@@ -2,10 +2,10 @@ package com.github.blkcor.controller;
 
 import com.github.blkcor.req.CronJobReq;
 import com.github.blkcor.resp.CommonResp;
-import jakarta.annotation.Resource;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class JobController {
     private static final Logger LOG = LoggerFactory.getLogger(JobController.class);
 
-    @Resource
+    @Autowired
     private SchedulerFactoryBean schedulerFactoryBean;
 
     @PostMapping("/add")
