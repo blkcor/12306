@@ -5,6 +5,7 @@ import com.github.blkcor.req.TrainSaveReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.TrainQueryResp;
+import com.github.blkcor.service.TrainSeatService;
 import com.github.blkcor.service.TrainService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -18,6 +19,9 @@ import java.util.List;
 public class AdminTrainController {
     @Resource
     private TrainService trainService;
+
+    @Resource
+    private TrainSeatService trainSeatService;
 
     @PostMapping("/save")
     public CommonResp<Void> saveTrain(@RequestBody  @Valid TrainSaveReq trainSaveReq) {
@@ -42,5 +46,10 @@ public class AdminTrainController {
     @GetMapping("/query-all")
     public CommonResp<List<TrainQueryResp>> queryAllTrainList() {
         return trainService.queryAllTrainList();
+    }
+
+    @DeleteMapping("/gen-seat/{trainCode}")
+    public CommonResp<Void> genSeat(@PathVariable String trainCode) {
+        return trainSeatService.genSeat(trainCode);
     }
 }

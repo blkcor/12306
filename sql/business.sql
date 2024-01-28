@@ -17,7 +17,7 @@ create table `train`
 (
     `id`           bigint      not null comment 'id',
     `code`         varchar(20) not null comment '车次编号',
-    `type`         char(1)     not null comment '车次类型|枚举[TrainTypeEnum]',
+    `type`         char(2)     not null comment '车次类型|枚举[TrainTypeEnum]',
     `start`        varchar(20) not null comment '始发站',
     `start_pinyin` varchar(50) not null comment '始发站拼音',
     `start_time`   time        not null comment '始发时间',
@@ -76,7 +76,7 @@ create table `train_seat`
     `train_code`   varchar(20) not null comment '车次编号',
     `carriage_index` int not null comment '车厢序号',
     `row`         char(2)         not null comment '排号|01,02',
-    `col`        char(1)         not null comment '列号|枚举[SeatColEnum]',
+    `col`        char(2)         not null comment '列号|枚举[SeatColEnum]',
     `seat_type`    varchar(20) not null comment '座位类型|枚举[SeatTypeEnum]',
     `carriage_seat_index` int not null comment '车厢座位序号',
     `create_time`  datetime(3) comment '新增时间',

@@ -14,7 +14,7 @@ create table `passenger`
     `member_id` bigint not null comment '会员id',
     `name` varchar(50) not null comment '姓名',
     `id_card` varchar(18) not null comment '身份证号',
-    `type` char(1) not null comment '乘客类型|枚举[PassengerTypeEnum]',
+    `type` char(2) not null comment '乘客类型|枚举[PassengerTypeEnum]',
     `create_time` datetime not null comment '创建时间',
     `update_time` datetime not null comment '更新时间',
     primary key (`id`),
