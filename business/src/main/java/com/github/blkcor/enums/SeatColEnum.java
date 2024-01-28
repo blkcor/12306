@@ -38,7 +38,7 @@ public enum SeatColEnum {
      * @param seatType 座位类型
      * @return 列代码列表
      */
-    public List<SeatColEnum> getColsByType(String seatType) {
+    public static List<SeatColEnum> getColsByType(String seatType) {
         List<SeatColEnum> cols = new ArrayList<>();
         for (SeatColEnum col : SeatColEnum.values()) {
             if (col.getSeatType().equals(seatType)) {

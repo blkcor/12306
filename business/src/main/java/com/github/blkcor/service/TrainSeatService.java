@@ -30,4 +30,11 @@ public interface TrainSeatService {
      * @return 返回结果
      */
     CommonResp<Void> deleteTrainSeat(Long id);
+
+    /**
+     * 生成座位信息
+     * @param trainCode 车次编码
+     * @return  返回结果
+     */
+    CommonResp<Void> genSeat(String trainCode);
 }

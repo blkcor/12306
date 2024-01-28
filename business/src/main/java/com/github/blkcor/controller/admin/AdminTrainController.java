@@ -48,7 +48,7 @@ public class AdminTrainController {
         return trainService.queryAllTrainList();
     }
 
-    @DeleteMapping("/gen-seat/{trainCode}")
+    @GetMapping("/gen-seat/{trainCode}")
     public CommonResp<Void> genSeat(@PathVariable String trainCode) {
         return trainSeatService.genSeat(trainCode);
     }

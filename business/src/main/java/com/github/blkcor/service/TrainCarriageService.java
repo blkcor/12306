@@ -10,14 +10,14 @@ import com.github.blkcor.resp.TrainCarriageQueryResp;
 public interface TrainCarriageService {
 
     /**
-     * 保存乘客信息
+     * 保存车厢信息
      * @param trainCarriageSaveReq 请求参数
      * @return 返回结果
      */
     CommonResp<Void> saveTrainCarriage(TrainCarriageSaveReq trainCarriageSaveReq);
 
     /**
-     * 查询乘客列表
+     * 查询车厢列表
      * @param trainCarriageQueryReq 请求参数
      * @return 返回结果
      */
@@ -25,8 +25,8 @@ public interface TrainCarriageService {
 
 
     /**
-     * 删除乘客信息
-     * @param id 乘客id
+     * 删除车厢信息
+     * @param id 车厢id
      * @return 返回结果
      */
     CommonResp<Void> deleteTrainCarriage(Long id);
