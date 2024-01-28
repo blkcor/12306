@@ -33,7 +33,6 @@ public class TrainSeatSaveReq {
     /**
      * 列号|枚举[SeatColEnum]
      */
-    @NotBlank(message = "列号不能为空")
     private String col;
     /**
      * 座位类型|枚举[SeatTypeEnum]

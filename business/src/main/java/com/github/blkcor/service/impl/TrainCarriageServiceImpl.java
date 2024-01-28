@@ -6,6 +6,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.blkcor.entity.TrainCarriage;
 import com.github.blkcor.entity.TrainCarriageExample;
+import com.github.blkcor.enums.SeatColEnum;
 import com.github.blkcor.mapper.TrainCarriageMapper;
 import com.github.blkcor.req.TrainCarriageQueryReq;
 import com.github.blkcor.req.TrainCarriageSaveReq;
@@ -31,13 +32,16 @@ public class TrainCarriageServiceImpl implements TrainCarriageService {
 
     @Override
     public CommonResp<Void> saveTrainCarriage(TrainCarriageSaveReq trainCarriageSaveReq) {
-        TrainCarriage trainCarriage  = BeanUtil.copyProperties(trainCarriageSaveReq, TrainCarriage.class);
-        if(ObjectUtil.isNull(trainCarriage.getId())){
+        TrainCarriage trainCarriage = BeanUtil.copyProperties(trainCarriageSaveReq, TrainCarriage.class);
+        List<SeatColEnum> colList = SeatColEnum.getColsByType(trainCarriage.getSeatType());
+        trainCarriage.setColCount(colList.size());
+        trainCarriage.setSeatCount(trainCarriage.getRowCount() * trainCarriage.getColCount());
+        if (ObjectUtil.isNull(trainCarriage.getId())) {
             trainCarriage.setCreateTime(DateTime.now());
             trainCarriage.setUpdateTime(DateTime.now());
-            trainCarriage.setId(IdUtil.getSnowflake(1,1).nextId());
+            trainCarriage.setId(IdUtil.getSnowflake(1, 1).nextId());
             trainCarriageMapper.insertSelective(trainCarriage);
-        }else{
+        } else {
             trainCarriage.setUpdateTime(DateTime.now());
             trainCarriageMapper.updateByPrimaryKeySelective(trainCarriage);
         }
@@ -49,15 +53,15 @@ public class TrainCarriageServiceImpl implements TrainCarriageService {
         TrainCarriageExample trainCarriageExample = new TrainCarriageExample();
         TrainCarriageExample.Criteria criteria = trainCarriageExample.createCriteria();
 
-        LOG.info("查询页码：{}",trainCarriageQueryReq.getPage());
-        LOG.info("查询条数：{}",trainCarriageQueryReq.getSize());
+        LOG.info("查询页码：{}", trainCarriageQueryReq.getPage());
+        LOG.info("查询条数：{}", trainCarriageQueryReq.getSize());
 
-        PageHelper.startPage(trainCarriageQueryReq.getPage(),trainCarriageQueryReq.getSize());
+        PageHelper.startPage(trainCarriageQueryReq.getPage(), trainCarriageQueryReq.getSize());
         List<TrainCarriage> trainCarriages = trainCarriageMapper.selectByExample(trainCarriageExample);
         PageInfo<TrainCarriage> pageInfo = new PageInfo<>(trainCarriages);
 
-        LOG.info("总条数：{}",pageInfo.getTotal());
-        LOG.info("总页数：{}",pageInfo.getPages());
+        LOG.info("总条数：{}", pageInfo.getTotal());
+        LOG.info("总页数：{}", pageInfo.getPages());
 
         List<TrainCarriageQueryResp> list = BeanUtil.copyToList(trainCarriages, TrainCarriageQueryResp.class);
         PageResp<TrainCarriageQueryResp> trainCarriageQueryRespPageResp = new PageResp<>();
