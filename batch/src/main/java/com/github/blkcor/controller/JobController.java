@@ -2,7 +2,9 @@ package com.github.blkcor.controller;
 
 import com.github.blkcor.req.CronJobReq;
 import com.github.blkcor.resp.CommonResp;
+import com.github.blkcor.resp.CronJobResp;
 import org.quartz.*;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/job")
@@ -132,5 +137,36 @@ public class JobController {
         }
         LOG.info("删除定时任务成功：{} {}", jobName, jobGroup);
         return CommonResp.success(null);
+    }
+
+    @PostMapping("/query")
+    public CommonResp<List<CronJobResp>> queryJob(@RequestBody CronJobReq cronJobReq){
+        LOG.info("查询定时任务开始");
+        List<CronJobResp> cronJobRespList = new ArrayList<>();
+        try{
+            Scheduler scheduler = schedulerFactoryBean.getScheduler();
+            for (String jobGroupName : scheduler.getJobGroupNames()) {
+                scheduler.getJobKeys(GroupMatcher.groupContains(jobGroupName)).forEach(jobKey -> {
+                    CronJobResp cronJobResp = new CronJobResp();
+                    cronJobResp.setName(jobKey.getName());
+                    cronJobResp.setGroup(jobKey.getGroup());
+                    try {
+                        CronTrigger cronTrigger = (CronTrigger) scheduler.getTrigger(TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
+                        cronJobResp.setCronExpression(cronTrigger.getCronExpression());
+                        cronJobResp.setDescription(cronTrigger.getDescription());
+                        cronJobResp.setPreviousFireTime(cronTrigger.getPreviousFireTime().toString());
+                        cronJobResp.setNextFireTime(cronTrigger.getNextFireTime().toString());
+                        cronJobResp.setStatus(scheduler.getTriggerState(TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup())).name());
+                        cronJobRespList.add(cronJobResp);
+                    } catch (SchedulerException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        } catch (SchedulerException e) {
+            LOG.error("查询定时任务失败：{}", e);
+            return new CommonResp<>(false, "查询定时任务失败", null);
+        }
+        return CommonResp.success(cronJobRespList);
     }
 }
