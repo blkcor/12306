@@ -51,8 +51,8 @@ public class DailyTrainServiceImpl implements DailyTrainService {
         dailyTrainExample.setOrderByClause("date desc, code asc");
         DailyTrainExample.Criteria criteria = dailyTrainExample.createCriteria();
         //增加选择查询条件
-        if (ObjectUtil.isNotEmpty(dailyTrainQueryReq.getCode())) {
-            criteria.andCodeEqualTo(dailyTrainQueryReq.getCode());
+        if (ObjectUtil.isNotEmpty(dailyTrainQueryReq.getTrainCode())) {
+            criteria.andCodeEqualTo(dailyTrainQueryReq.getTrainCode());
         }
 
         if (ObjectUtil.isNotEmpty(dailyTrainQueryReq.getDate())) {

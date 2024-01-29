@@ -10,7 +10,7 @@ import java.util.Date;
 @Data
 public class DailyTrainQueryReq extends PageReq {
 
-    private String code;
+    private String trainCode;
 
     /**
      * 对于Get请求，SpringMVC默认使用ISO-8859-1编码，所以需要使用@DateTimeFormat注解指定日期格式
