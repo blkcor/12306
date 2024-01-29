@@ -109,7 +109,11 @@
 <!--               enableCountByExample="true" enableDeleteByExample="true" enableSelectByExample="true"-->
 <!--               enableUpdateByExample="true" selectByExampleQueryId="true">-->
 <!--        </table>-->
-        <table schema="" tableName="train_seat" domainObjectName="TrainSeat"
+<!--        <table schema="" tableName="train_seat" domainObjectName="TrainSeat"-->
+<!--               enableCountByExample="true" enableDeleteByExample="true" enableSelectByExample="true"-->
+<!--               enableUpdateByExample="true" selectByExampleQueryId="true">-->
+<!--        </table>-->
+        <table schema="" tableName="daily_train" domainObjectName="DailyTrain"
                enableCountByExample="true" enableDeleteByExample="true" enableSelectByExample="true"
                enableUpdateByExample="true" selectByExampleQueryId="true">
         </table>

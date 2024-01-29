@@ -56,11 +56,11 @@ create table `train_carriage`
 (
     `id`          bigint      not null comment 'id',
     `train_code`  varchar(20) not null comment '车次编号',
-    `index` int not null comment '车厢序号',
+    `index`       int         not null comment '车厢序号',
     `seat_type`   varchar(20) not null comment '座位类型|枚举[SeatTypeEnum]',
     `seat_count`  int         not null comment '座位数量',
     `row_count`   int         not null comment '行数',
-    `col_count` int        not null comment '列数',
+    `col_count`   int         not null comment '列数',
     `create_time` datetime(3) comment '新增时间',
     `update_time` datetime(3) comment '更新时间',
     primary key (`id`),
@@ -72,15 +72,35 @@ create table `train_carriage`
 drop table if exists `train_seat`;
 create table `train_seat`
 (
-    `id`           bigint      not null comment 'id',
-    `train_code`   varchar(20) not null comment '车次编号',
-    `carriage_index` int not null comment '车厢序号',
-    `row`         char(2)         not null comment '排号|01,02',
-    `col`        char(2)         not null comment '列号|枚举[SeatColEnum]',
-    `seat_type`    varchar(20) not null comment '座位类型|枚举[SeatTypeEnum]',
-    `carriage_seat_index` int not null comment '车厢座位序号',
-    `create_time`  datetime(3) comment '新增时间',
-    `update_time`  datetime(3) comment '更新时间',
+    `id`                  bigint      not null comment 'id',
+    `train_code`          varchar(20) not null comment '车次编号',
+    `carriage_index`      int         not null comment '车厢序号',
+    `row`                 char(2)     not null comment '排号|01,02',
+    `col`                 char(2)     not null comment '列号|枚举[SeatColEnum]',
+    `seat_type`           varchar(20) not null comment '座位类型|枚举[SeatTypeEnum]',
+    `carriage_seat_index` int         not null comment '车厢座位序号',
+    `create_time`         datetime(3) comment '新增时间',
+    `update_time`         datetime(3) comment '更新时间',
     primary key (`id`)
 ) engine = InnoDB
   default charset = utf8mb4 comment ='车次座位表';
+
+drop table if exists `daily_train`;
+create table `daily_train`
+(
+    `id`           bigint      not null comment 'id',
+    `date`         date        not null comment '日期',
+    `code`         varchar(20) not null comment '车次编号',
+    `type`         char(2)     not null comment '车次类型|枚举[TrainTypeEnum]',
+    `start`        varchar(20) not null comment '始发站',
+    `start_pinyin` varchar(50) not null comment '始发站拼音',
+    `start_time`   time        not null comment '始发时间',
+    `end`          varchar(20) not null comment '终点站',
+    `end_pinyin`   varchar(50) not null comment '终点站拼音',
+    `end_time`     time        not null comment '终点时间',
+    `create_time`  datetime(3) comment '新增时间',
+    `update_time`  datetime(3) comment '更新时间',
+    primary key (`id`),
+    unique key `date_code_unique` (`date`,`code`)
+) engine = InnoDB
+  default charset = utf8mb4 comment ='每日车次表';
