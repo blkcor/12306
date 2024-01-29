@@ -31,13 +31,13 @@ public class DailyTrainServiceImpl implements DailyTrainService {
 
     @Override
     public CommonResp<Void> saveDailyTrain(DailyTrainSaveReq dailyTrainSaveReq) {
-        DailyTrain dailyTrain  = BeanUtil.copyProperties(dailyTrainSaveReq, DailyTrain.class);
-        if(ObjectUtil.isNull(dailyTrain.getId())){
+        DailyTrain dailyTrain = BeanUtil.copyProperties(dailyTrainSaveReq, DailyTrain.class);
+        if (ObjectUtil.isNull(dailyTrain.getId())) {
             dailyTrain.setCreateTime(DateTime.now());
             dailyTrain.setUpdateTime(DateTime.now());
-            dailyTrain.setId(IdUtil.getSnowflake(1,1).nextId());
+            dailyTrain.setId(IdUtil.getSnowflake(1, 1).nextId());
             dailyTrainMapper.insertSelective(dailyTrain);
-        }else{
+        } else {
             dailyTrain.setUpdateTime(DateTime.now());
             dailyTrainMapper.updateByPrimaryKeySelective(dailyTrain);
         }
@@ -47,17 +47,27 @@ public class DailyTrainServiceImpl implements DailyTrainService {
     @Override
     public CommonResp<PageResp<DailyTrainQueryResp>> queryDailyTrainList(DailyTrainQueryReq dailyTrainQueryReq) {
         DailyTrainExample dailyTrainExample = new DailyTrainExample();
+        //按日期倒序，车次升序排列
+        dailyTrainExample.setOrderByClause("date desc, code asc");
         DailyTrainExample.Criteria criteria = dailyTrainExample.createCriteria();
+        //增加选择查询条件
+        if (ObjectUtil.isNotEmpty(dailyTrainQueryReq.getCode())) {
+            criteria.andCodeEqualTo(dailyTrainQueryReq.getCode());
+        }
 
-        LOG.info("查询页码：{}",dailyTrainQueryReq.getPage());
-        LOG.info("查询条数：{}",dailyTrainQueryReq.getSize());
+        if (ObjectUtil.isNotEmpty(dailyTrainQueryReq.getDate())) {
+            criteria.andDateEqualTo(dailyTrainQueryReq.getDate());
+        }
 
-        PageHelper.startPage(dailyTrainQueryReq.getPage(),dailyTrainQueryReq.getSize());
+        LOG.info("查询页码：{}", dailyTrainQueryReq.getPage());
+        LOG.info("查询条数：{}", dailyTrainQueryReq.getSize());
+
+        PageHelper.startPage(dailyTrainQueryReq.getPage(), dailyTrainQueryReq.getSize());
         List<DailyTrain> dailyTrains = dailyTrainMapper.selectByExample(dailyTrainExample);
         PageInfo<DailyTrain> pageInfo = new PageInfo<>(dailyTrains);
 
-        LOG.info("总条数：{}",pageInfo.getTotal());
-        LOG.info("总页数：{}",pageInfo.getPages());
+        LOG.info("总条数：{}", pageInfo.getTotal());
+        LOG.info("总页数：{}", pageInfo.getPages());
 
         List<DailyTrainQueryResp> list = BeanUtil.copyToList(dailyTrains, DailyTrainQueryResp.class);
         PageResp<DailyTrainQueryResp> dailyTrainQueryRespPageResp = new PageResp<>();

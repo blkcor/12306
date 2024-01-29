@@ -50,10 +50,9 @@ public class TrainStationSaveReq {
     @NotNull(message = "出站时间不能为空")
     private Date outTime;
     /**
-     * 停留时间
+     * 停留时间，前端自动计算填充
      */
     @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
-    @NotNull(message = "停留时间不能为空")
     private Date stopTime;
     /**
      * 公里数|从上一站到本站的距离
