@@ -80,6 +80,10 @@ public class TrainStationServiceImpl implements TrainStationService {
     public CommonResp<PageResp<TrainStationQueryResp>> queryTrainStationList(TrainStationQueryReq trainStationQueryReq) {
         TrainStationExample trainStationExample = new TrainStationExample();
         TrainStationExample.Criteria criteria = trainStationExample.createCriteria();
+        //增加选择查询条件
+        if(ObjectUtil.isNotEmpty(trainStationQueryReq.getCode())){
+            criteria.andTrainCodeEqualTo(trainStationQueryReq.getCode());
+        }
 
         LOG.info("查询页码：{}", trainStationQueryReq.getPage());
         LOG.info("查询条数：{}", trainStationQueryReq.getSize());

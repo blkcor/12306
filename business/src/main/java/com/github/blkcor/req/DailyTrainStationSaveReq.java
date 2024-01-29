@@ -12,11 +12,17 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TrainStationSaveReq {
+public class DailyTrainStationSaveReq {
     /**
      * id
      */
     private Long id;
+    /**
+     * 日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @NotNull(message = "日期不能为空")
+    private Date date;
     /**
      * 车次编号
      */
@@ -50,9 +56,10 @@ public class TrainStationSaveReq {
     @NotNull(message = "出站时间不能为空")
     private Date outTime;
     /**
-     * 停留时间，前端自动计算填充
+     * 停留时间
      */
     @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
+    @NotNull(message = "停留时间不能为空")
     private Date stopTime;
     /**
      * 公里数|从上一站到本站的距离
