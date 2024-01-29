@@ -39,20 +39,10 @@ public class DailyTrainCarriageSaveReq {
     @NotBlank(message = "座位类型不能为空")
     private String seatType;
     /**
-     * 座位数量
-     */
-    @NotNull(message = "座位数量不能为空")
-    private Integer seatCount;
-    /**
      * 行数
      */
     @NotNull(message = "行数不能为空")
     private Integer rowCount;
-    /**
-     * 列数
-     */
-    @NotNull(message = "列数不能为空")
-    private Integer colCount;
     /**
      * 新增时间
      */
