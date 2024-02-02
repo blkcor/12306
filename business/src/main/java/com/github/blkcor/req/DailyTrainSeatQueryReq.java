@@ -6,5 +6,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class DailyTrainSeatQueryReq extends PageReq {
-
+    private String trainCode;
 }

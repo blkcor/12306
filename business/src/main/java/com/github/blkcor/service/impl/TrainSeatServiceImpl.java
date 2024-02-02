@@ -56,8 +56,11 @@ public class TrainSeatServiceImpl implements TrainSeatService {
     @Override
     public CommonResp<PageResp<TrainSeatQueryResp>> queryTrainSeatList(TrainSeatQueryReq trainSeatQueryReq) {
         TrainSeatExample trainSeatExample = new TrainSeatExample();
+        trainSeatExample.setOrderByClause("train_code asc,carriage_index asc,carriage_seat_index asc");
         TrainSeatExample.Criteria criteria = trainSeatExample.createCriteria();
-
+        if (StrUtil.isNotBlank(trainSeatQueryReq.getTrainCode())) {
+            criteria.andTrainCodeEqualTo(trainSeatQueryReq.getTrainCode());
+        }
         LOG.info("查询页码：{}", trainSeatQueryReq.getPage());
         LOG.info("查询条数：{}", trainSeatQueryReq.getSize());
 

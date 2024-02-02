@@ -47,8 +47,11 @@ public class DailyTrainSeatServiceImpl implements DailyTrainSeatService {
     @Override
     public CommonResp<PageResp<DailyTrainSeatQueryResp>> queryDailyTrainSeatList(DailyTrainSeatQueryReq dailyTrainSeatQueryReq) {
         DailyTrainSeatExample dailyTrainSeatExample = new DailyTrainSeatExample();
+        dailyTrainSeatExample.setOrderByClause("train_code asc,carriage_index asc,carriage_seat_index asc");
         DailyTrainSeatExample.Criteria criteria = dailyTrainSeatExample.createCriteria();
-
+        if(ObjectUtil.isNotEmpty(dailyTrainSeatQueryReq.getTrainCode())){
+            criteria.andTrainCodeEqualTo(dailyTrainSeatQueryReq.getTrainCode());
+        }
         LOG.info("查询页码：{}",dailyTrainSeatQueryReq.getPage());
         LOG.info("查询条数：{}",dailyTrainSeatQueryReq.getSize());
 
