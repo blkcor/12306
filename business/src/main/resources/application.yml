@@ -3,7 +3,10 @@ server:
   servlet:
     context-path: /business
     application-display-name: business-service
+
 spring:
+  application:
+    name: business
   output:
     ansi:
       enabled: always

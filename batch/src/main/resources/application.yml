@@ -4,6 +4,8 @@ server:
     context-path: /batch
     application-display-name: batch-service
 spring:
+  application:
+    name: batch
   output:
     ansi:
       enabled: always

@@ -13,6 +13,8 @@ spring:
     username: train
     password: Blkcor@dev123
     driver-class-name: com.mysql.cj.jdbc.Driver
+  application:
+    name: member
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
 
