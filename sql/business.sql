@@ -101,7 +101,7 @@ create table `daily_train`
     `create_time`  datetime(3) comment '新增时间',
     `update_time`  datetime(3) comment '更新时间',
     primary key (`id`),
-    unique key `date_code_unique` (`date`,`code`)
+    unique key `date_code_unique` (`date`, `code`)
 ) engine = InnoDB
   default charset = utf8mb4 comment ='每日车次表';
 
@@ -123,8 +123,8 @@ create table `daily_train_station`
     `create_time` datetime(3) comment '新增时间',
     `update_time` datetime(3) comment '更新时间',
     primary key (`id`),
-    unique key `date_train_code_index_unique` (`date`,`train_code`, `index`),
-    unique key `date_train_code_name_unique` (`date`,`train_code`, `name`)
+    unique key `date_train_code_index_unique` (`date`, `train_code`, `index`),
+    unique key `date_train_code_name_unique` (`date`, `train_code`, `name`)
 ) engine = InnoDB
   default charset = utf8mb4 comment ='每日车次车站表';
 
@@ -145,4 +145,22 @@ create table `daily_train_carriage`
     primary key (`id`),
     unique key `train_code_index_unique` (`train_code`, `index`)
 ) engine = InnoDB
-  default charset = utf8mb4 comment ='，每日车次车厢表';
+  default charset = utf8mb4 comment ='每日车次车厢表';
+
+drop table if exists `daily_train_seat`;
+create table `daily_train_seat`
+(
+    `id`                  bigint      not null comment 'id',
+    `date`                date        not null comment '日期',
+    `train_code`          varchar(20) not null comment '车次编号',
+    `carriage_index`      int         not null comment '车厢序号',
+    `row`                 char(2)     not null comment '排号|01,02',
+    `col`                 char(2)     not null comment '列号|枚举[SeatColEnum]',
+    `seat_type`           varchar(20) not null comment '座位类型|枚举[SeatTypeEnum]',
+    `carriage_seat_index` int         not null comment '车厢座位序号',
+    `sell`                varchar(50) not null comment '售票状态|将经过的车站使用01来拼接，0代表未售，1代表已售',
+    `create_time`         datetime(3) comment '新增时间',
+    `update_time`         datetime(3) comment '更新时间',
+    primary key (`id`)
+) engine = InnoDB
+  default charset = utf8mb4 comment ='每日车次座位表';
