@@ -1,18 +1,21 @@
 package com.github.blkcor.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.github.blkcor.entity.DailyTrainSeat;
-import com.github.blkcor.entity.DailyTrainSeatExample;
+import com.github.blkcor.entity.*;
 import com.github.blkcor.mapper.DailyTrainSeatMapper;
+import com.github.blkcor.mapper.TrainMapper;
 import com.github.blkcor.req.DailyTrainSeatQueryReq;
 import com.github.blkcor.req.DailyTrainSeatSaveReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.DailyTrainSeatQueryResp;
+import com.github.blkcor.resp.TrainQueryResp;
 import com.github.blkcor.service.DailyTrainSeatService;
+import com.github.blkcor.service.TrainService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
@@ -28,7 +31,8 @@ public class DailyTrainSeatServiceImpl implements DailyTrainSeatService {
     private static final Logger LOG = LoggerFactory.getLogger(DailyTrainSeatServiceImpl.class);
     @Resource
     private DailyTrainSeatMapper dailyTrainSeatMapper;
-
+    @Resource
+    private TrainMapper trainMapper;
     @Override
     public CommonResp<Void> saveDailyTrainSeat(DailyTrainSeatSaveReq dailyTrainSeatSaveReq) {
         DailyTrainSeat dailyTrainSeat  = BeanUtil.copyProperties(dailyTrainSeatSaveReq, DailyTrainSeat.class);

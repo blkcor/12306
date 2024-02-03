@@ -60,15 +60,28 @@ public class JobController {
     public CommonResp<Void> runJob(@RequestBody CronJobReq cronJobReq){
         String jobName = cronJobReq.getName();
         String jobGroup = cronJobReq.getGroup();
+        String description = cronJobReq.getDescription();
         LOG.info("立即执行定时任务开始：{} {}", jobName, jobGroup);
         try {
             //获得调度器实例
             Scheduler scheduler = schedulerFactoryBean.getScheduler();
+            // 创建一个立即执行的简单触发器
+            JobDetail jobDetail = JobBuilder.newJob((Class<? extends Job>) Class.forName(jobName))
+                    .withIdentity(jobName + "-once", jobGroup)
+                    .withDescription(description)
+                    .build();
+            SimpleTrigger simpleTrigger = (SimpleTrigger) TriggerBuilder.newTrigger()
+                    .forJob(jobDetail)
+                    .withIdentity(jobName + "-trigger", jobGroup)
+                    .startNow() // 立即触发
+                    .build();
             //立即执行定时任务
-            scheduler.triggerJob(JobKey.jobKey(jobName, jobGroup));
+            scheduler.scheduleJob(jobDetail, simpleTrigger);
         } catch (SchedulerException e) {
             LOG.error("立即执行定时任务失败：{}", e);
             return new CommonResp<>(false, "立即执行定时任务失败", null);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
         LOG.info("立即执行定时任务成功：{} {}", jobName, jobGroup);
         return CommonResp.success(null);

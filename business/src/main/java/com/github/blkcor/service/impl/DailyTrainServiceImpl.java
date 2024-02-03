@@ -1,12 +1,16 @@
 package com.github.blkcor.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.blkcor.entity.DailyTrain;
 import com.github.blkcor.entity.DailyTrainExample;
+import com.github.blkcor.entity.Train;
+import com.github.blkcor.entity.TrainExample;
 import com.github.blkcor.mapper.DailyTrainMapper;
+import com.github.blkcor.mapper.TrainMapper;
 import com.github.blkcor.req.DailyTrainQueryReq;
 import com.github.blkcor.req.DailyTrainSaveReq;
 import com.github.blkcor.resp.CommonResp;
@@ -18,8 +22,10 @@ import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -28,6 +34,8 @@ public class DailyTrainServiceImpl implements DailyTrainService {
     private static final Logger LOG = LoggerFactory.getLogger(DailyTrainServiceImpl.class);
     @Resource
     private DailyTrainMapper dailyTrainMapper;
+    @Resource
+    private TrainMapper trainMapper;
 
     @Override
     public CommonResp<Void> saveDailyTrain(DailyTrainSaveReq dailyTrainSaveReq) {
@@ -80,5 +88,36 @@ public class DailyTrainServiceImpl implements DailyTrainService {
     public CommonResp<Void> deleteDailyTrain(Long id) {
         dailyTrainMapper.deleteByPrimaryKey(id);
         return CommonResp.success(null);
+    }
+
+    @Override
+    public CommonResp<Void> genDaily(Date date) {
+        //查询所有的车次信息
+        TrainExample trainExample = new TrainExample();
+        trainExample.setOrderByClause("code asc");
+        List<Train> trainList = trainMapper.selectByExample(trainExample);
+        if(CollUtil.isEmpty(trainList)){
+            LOG.info("没有车次信息，任务结束");
+            return CommonResp.success(null);
+        }
+        //生成车次，车厢，座位信息
+        trainList.forEach(train -> genDailyTrain(date,train));
+        return null;
+    }
+
+    private void genDailyTrain(Date date,Train train){
+        //清空每日车次数据
+        DailyTrainExample dailyTrainExample = new DailyTrainExample();
+        dailyTrainExample.createCriteria()
+                .andDateEqualTo(date)
+                .andCodeEqualTo(train.getCode());
+        dailyTrainMapper.deleteByExample(dailyTrainExample);
+        //生成每日车次数据
+        DailyTrain dailyTrain = BeanUtil.copyProperties(train, DailyTrain.class);
+        dailyTrain.setDate(date);
+        dailyTrain.setCreateTime(DateTime.now());
+        dailyTrain.setUpdateTime(DateTime.now());
+        dailyTrain.setId(IdUtil.getSnowflake(1,1).nextId());
+        dailyTrainMapper.insertSelective(dailyTrain);
     }
 }

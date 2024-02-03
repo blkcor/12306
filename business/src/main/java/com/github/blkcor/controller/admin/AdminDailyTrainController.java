@@ -8,7 +8,10 @@ import com.github.blkcor.resp.DailyTrainQueryResp;
 import com.github.blkcor.service.DailyTrainService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 
 @RestController
@@ -35,5 +38,12 @@ public class AdminDailyTrainController {
     @DeleteMapping("/delete/{id}")
     public CommonResp<Void> deleteDailyTrain(@PathVariable Long id) {
         return dailyTrainService.deleteDailyTrain(id);
+    }
+
+    @GetMapping("/gen-daily/{date}")
+    public CommonResp<Void> genDaily(
+            @PathVariable
+            @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        return dailyTrainService.genDaily(date);
     }
 }
