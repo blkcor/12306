@@ -123,7 +123,11 @@
 <!--        <table schema="" tableName="daily_train_carriage" domainObjectName="DailyTrainCarriage"-->
 <!--               enableCountByExample="true" enableDeleteByExample="true" enableSelectByExample="true"-->
 <!--               enableUpdateByExample="true" selectByExampleQueryId="true">-->
-        <table schema="" tableName="daily_train_seat" domainObjectName="DailyTrainSeat"
+<!--        <table schema="" tableName="daily_train_seat" domainObjectName="DailyTrainSeat"-->
+<!--               enableCountByExample="true" enableDeleteByExample="true" enableSelectByExample="true"-->
+<!--               enableUpdateByExample="true" selectByExampleQueryId="true">-->
+<!--        </table>-->
+        <table schema="" tableName="daily_train_ticket" domainObjectName="DailyTrainTicket"
                enableCountByExample="true" enableDeleteByExample="true" enableSelectByExample="true"
                enableUpdateByExample="true" selectByExampleQueryId="true">
         </table>

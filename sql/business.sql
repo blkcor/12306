@@ -164,3 +164,32 @@ create table `daily_train_seat`
     primary key (`id`)
 ) engine = InnoDB
   default charset = utf8mb4 comment ='每日车次座位表';
+
+drop table if exists `daily_train_ticket`;
+create table `daily_train_ticket`
+(
+    `id`           bigint        not null comment 'id',
+    `date`         date          not null comment '日期',
+    `train_code`   varchar(20)   not null comment '车次编号',
+    `start`        varchar(20)   not null comment '始发站',
+    `start_pinyin` varchar(50)   not null comment '始发站拼音',
+    `start_time`   time          not null comment '始发时间',
+    `start_index`  int           not null comment '出发序号|本次是整个车次的第几站',
+    `end`          varchar(20)   not null comment '终点站',
+    `end_pinyin`   varchar(50)   not null comment '终点站拼音',
+    `end_time`     time          not null comment '终点时间',
+    `end_index`    int           not null comment '到达序号|本次是整个车次的第几站',
+    `ydz`          int           not null comment '一等座余票',
+    `ydz_price`    decimal(8, 2) not null comment '一等座票价',
+    `edz`          int           not null comment '二等座余票',
+    `edz_price`    decimal(8, 2) not null comment '二等座票价',
+    `rw`          int           not null comment '软卧余票',
+    `rw_price`    decimal(8, 2) not null comment '软卧票价',
+    `yw`          int           not null comment '硬卧余票',
+    `yw_price`    decimal(8, 2) not null comment '硬卧票价',
+    `create_time`  datetime(3) comment '新增时间',
+    `update_time`  datetime(3) comment '更新时间',
+    primary key (`id`),
+    unique key `date_train_code_start_end_unique` (`date`, `train_code`,`start`,`end`)
+) engine = InnoDB
+  default charset = utf8mb4 comment ='每日车次余票表';
