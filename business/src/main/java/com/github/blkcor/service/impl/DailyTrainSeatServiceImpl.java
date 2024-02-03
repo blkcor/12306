@@ -8,6 +8,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.github.blkcor.entity.*;
 import com.github.blkcor.mapper.DailyTrainSeatMapper;
 import com.github.blkcor.mapper.TrainMapper;
+import com.github.blkcor.mapper.TrainSeatMapper;
 import com.github.blkcor.req.DailyTrainSeatQueryReq;
 import com.github.blkcor.req.DailyTrainSeatSaveReq;
 import com.github.blkcor.resp.CommonResp;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -32,16 +34,17 @@ public class DailyTrainSeatServiceImpl implements DailyTrainSeatService {
     @Resource
     private DailyTrainSeatMapper dailyTrainSeatMapper;
     @Resource
-    private TrainMapper trainMapper;
+    private TrainSeatMapper trainSeatMapper;
+
     @Override
     public CommonResp<Void> saveDailyTrainSeat(DailyTrainSeatSaveReq dailyTrainSeatSaveReq) {
-        DailyTrainSeat dailyTrainSeat  = BeanUtil.copyProperties(dailyTrainSeatSaveReq, DailyTrainSeat.class);
-        if(ObjectUtil.isNull(dailyTrainSeat.getId())){
+        DailyTrainSeat dailyTrainSeat = BeanUtil.copyProperties(dailyTrainSeatSaveReq, DailyTrainSeat.class);
+        if (ObjectUtil.isNull(dailyTrainSeat.getId())) {
             dailyTrainSeat.setCreateTime(DateTime.now());
             dailyTrainSeat.setUpdateTime(DateTime.now());
-            dailyTrainSeat.setId(IdUtil.getSnowflake(1,1).nextId());
+            dailyTrainSeat.setId(IdUtil.getSnowflake(1, 1).nextId());
             dailyTrainSeatMapper.insertSelective(dailyTrainSeat);
-        }else{
+        } else {
             dailyTrainSeat.setUpdateTime(DateTime.now());
             dailyTrainSeatMapper.updateByPrimaryKeySelective(dailyTrainSeat);
         }
@@ -53,18 +56,18 @@ public class DailyTrainSeatServiceImpl implements DailyTrainSeatService {
         DailyTrainSeatExample dailyTrainSeatExample = new DailyTrainSeatExample();
         dailyTrainSeatExample.setOrderByClause("train_code asc,carriage_index asc,carriage_seat_index asc");
         DailyTrainSeatExample.Criteria criteria = dailyTrainSeatExample.createCriteria();
-        if(ObjectUtil.isNotEmpty(dailyTrainSeatQueryReq.getTrainCode())){
+        if (ObjectUtil.isNotEmpty(dailyTrainSeatQueryReq.getTrainCode())) {
             criteria.andTrainCodeEqualTo(dailyTrainSeatQueryReq.getTrainCode());
         }
-        LOG.info("查询页码：{}",dailyTrainSeatQueryReq.getPage());
-        LOG.info("查询条数：{}",dailyTrainSeatQueryReq.getSize());
+        LOG.info("查询页码：{}", dailyTrainSeatQueryReq.getPage());
+        LOG.info("查询条数：{}", dailyTrainSeatQueryReq.getSize());
 
-        PageHelper.startPage(dailyTrainSeatQueryReq.getPage(),dailyTrainSeatQueryReq.getSize());
+        PageHelper.startPage(dailyTrainSeatQueryReq.getPage(), dailyTrainSeatQueryReq.getSize());
         List<DailyTrainSeat> dailyTrainSeats = dailyTrainSeatMapper.selectByExample(dailyTrainSeatExample);
         PageInfo<DailyTrainSeat> pageInfo = new PageInfo<>(dailyTrainSeats);
 
-        LOG.info("总条数：{}",pageInfo.getTotal());
-        LOG.info("总页数：{}",pageInfo.getPages());
+        LOG.info("总条数：{}", pageInfo.getTotal());
+        LOG.info("总页数：{}", pageInfo.getPages());
 
         List<DailyTrainSeatQueryResp> list = BeanUtil.copyToList(dailyTrainSeats, DailyTrainSeatQueryResp.class);
         PageResp<DailyTrainSeatQueryResp> dailyTrainSeatQueryRespPageResp = new PageResp<>();
@@ -77,5 +80,32 @@ public class DailyTrainSeatServiceImpl implements DailyTrainSeatService {
     public CommonResp<Void> deleteDailyTrainSeat(Long id) {
         dailyTrainSeatMapper.deleteByPrimaryKey(id);
         return CommonResp.success(null);
+    }
+
+    @Override
+    public CommonResp<Void> genDailyTrainSeat(Date date, String trainCode) {
+        LOG.info("生成每日车次座位信息，日期：{}，车次：{}，任务开始", date, trainCode);
+        TrainSeatExample trainSeatExample = new TrainSeatExample();
+        trainSeatExample.createCriteria().andTrainCodeEqualTo(trainCode);
+        List<TrainSeat> trainSeatList = trainSeatMapper.selectByExample(trainSeatExample);
+        if (CollUtil.isEmpty(trainSeatList)) {
+            LOG.error("车次{}的座位信息为空", trainCode);
+            return CommonResp.fail("车次座位信息为空");
+        }
+        DailyTrainSeatExample dailyTrainSeatExample = new DailyTrainSeatExample();
+        dailyTrainSeatExample.createCriteria().andDateEqualTo(date).andTrainCodeEqualTo(trainCode);
+        dailyTrainSeatMapper.deleteByExample(dailyTrainSeatExample);
+        trainSeatList.forEach(trainSeat -> genDailyTrainSeat(date, trainSeat));
+        LOG.info("生成每日车次座位信息，日期：{}，车次：{}，任务结束", date, trainCode);
+        return CommonResp.success(null);
+    }
+
+    private void genDailyTrainSeat(Date date, TrainSeat trainSeat) {
+        DailyTrainSeat dailyTrainSeat = BeanUtil.copyProperties(trainSeat, DailyTrainSeat.class);
+        dailyTrainSeat.setId(IdUtil.getSnowflake(1, 1).nextId());
+        dailyTrainSeat.setDate(date);
+        dailyTrainSeat.setCreateTime(DateTime.now());
+        dailyTrainSeat.setUpdateTime(DateTime.now());
+        dailyTrainSeatMapper.insertSelective(dailyTrainSeat);
     }
 }

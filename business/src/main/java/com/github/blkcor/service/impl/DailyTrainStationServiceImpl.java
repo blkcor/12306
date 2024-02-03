@@ -1,12 +1,16 @@
 package com.github.blkcor.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.blkcor.entity.DailyTrainStation;
 import com.github.blkcor.entity.DailyTrainStationExample;
+import com.github.blkcor.entity.TrainStation;
+import com.github.blkcor.entity.TrainStationExample;
 import com.github.blkcor.mapper.DailyTrainStationMapper;
+import com.github.blkcor.mapper.TrainStationMapper;
 import com.github.blkcor.req.DailyTrainStationQueryReq;
 import com.github.blkcor.req.DailyTrainStationSaveReq;
 import com.github.blkcor.resp.CommonResp;
@@ -20,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -28,6 +33,8 @@ public class DailyTrainStationServiceImpl implements DailyTrainStationService {
     private static final Logger LOG = LoggerFactory.getLogger(DailyTrainStationServiceImpl.class);
     @Resource
     private DailyTrainStationMapper dailyTrainStationMapper;
+    @Resource
+    private TrainStationMapper trainStationMapper;
 
     @Override
     public CommonResp<Void> saveDailyTrainStation(DailyTrainStationSaveReq dailyTrainStationSaveReq) {
@@ -76,5 +83,31 @@ public class DailyTrainStationServiceImpl implements DailyTrainStationService {
     public CommonResp<Void> deleteDailyTrainStation(Long id) {
         dailyTrainStationMapper.deleteByPrimaryKey(id);
         return CommonResp.success(null);
+    }
+
+    @Override
+    public CommonResp<Void> genDailyTrainStation(Date date, String trainCode) {
+        LOG.info("生成{}车次{}的车站信息", date, trainCode);
+        TrainStationExample trainStationExample = new TrainStationExample();
+        trainStationExample.createCriteria().andTrainCodeEqualTo(trainCode);
+        List<TrainStation> trainStationList = trainStationMapper.selectByExample(trainStationExample);
+        if (CollUtil.isEmpty(trainStationList)) {
+            LOG.info("车次{}没有找到对应的车站信息", trainCode);
+            return CommonResp.fail("车次没有找到对应的车站信息");
+        }
+        DailyTrainStationExample dailyTrainStationExample = new DailyTrainStationExample();
+        dailyTrainStationExample.createCriteria().andDateEqualTo(date).andTrainCodeEqualTo(trainCode);
+        dailyTrainStationMapper.deleteByExample(dailyTrainStationExample);
+        trainStationList.forEach(trainStation -> genDailyTrainStation(date, trainStation));
+        return CommonResp.success(null);
+    }
+
+    private void genDailyTrainStation(Date date, TrainStation trainStation) {
+        DailyTrainStation dailyTrainStation = BeanUtil.copyProperties(trainStation, DailyTrainStation.class);
+        dailyTrainStation.setId(IdUtil.getSnowflake(1, 1).nextId());
+        dailyTrainStation.setDate(date);
+        dailyTrainStation.setCreateTime(DateTime.now());
+        dailyTrainStation.setUpdateTime(DateTime.now());
+        dailyTrainStationMapper.insertSelective(dailyTrainStation);
     }
 }

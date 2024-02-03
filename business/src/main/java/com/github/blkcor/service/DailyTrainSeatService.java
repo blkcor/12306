@@ -6,6 +6,8 @@ import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.DailyTrainSeatQueryResp;
 
+import java.util.Date;
+
 
 public interface DailyTrainSeatService {
 
@@ -30,4 +32,12 @@ public interface DailyTrainSeatService {
      * @return 返回结果
      */
     CommonResp<Void> deleteDailyTrainSeat(Long id);
+
+    /**
+     * 生成每日车次座位信息
+     * @param date 日期
+     * @param trainCode 车次编号
+     * @return 返回结果
+     */
+    CommonResp<Void> genDailyTrainSeat(Date date, String trainCode);
 }
