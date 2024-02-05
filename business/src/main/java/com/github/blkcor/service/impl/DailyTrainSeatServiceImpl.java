@@ -3,20 +3,19 @@ package com.github.blkcor.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.blkcor.entity.*;
+import com.github.blkcor.enums.SeatTypeEnum;
 import com.github.blkcor.mapper.DailyTrainSeatMapper;
-import com.github.blkcor.mapper.TrainMapper;
 import com.github.blkcor.mapper.TrainSeatMapper;
 import com.github.blkcor.req.DailyTrainSeatQueryReq;
 import com.github.blkcor.req.DailyTrainSeatSaveReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.DailyTrainSeatQueryResp;
-import com.github.blkcor.resp.TrainQueryResp;
 import com.github.blkcor.service.DailyTrainSeatService;
-import com.github.blkcor.service.TrainService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
@@ -107,5 +106,19 @@ public class DailyTrainSeatServiceImpl implements DailyTrainSeatService {
         dailyTrainSeat.setCreateTime(DateTime.now());
         dailyTrainSeat.setUpdateTime(DateTime.now());
         dailyTrainSeatMapper.insertSelective(dailyTrainSeat);
+    }
+
+    @Override
+    public Long countSeat(Date date, String trainCode, String seatType) {
+        DailyTrainSeatExample dailyTrainSeatExample = new DailyTrainSeatExample();
+        dailyTrainSeatExample.createCriteria().andDateEqualTo(date).andTrainCodeEqualTo(trainCode).andSeatTypeEqualTo(seatType);
+        long remain = dailyTrainSeatMapper.countByExample(dailyTrainSeatExample);
+        //如果座位为0，则返回-1，表示不售卖，前端比较好展示
+        if (remain == 0L) {
+            String desc = EnumUtil.getFieldBy(SeatTypeEnum::getDesc, SeatTypeEnum::getCode, seatType);
+            LOG.error("车次{}的{}类型的座位座位为不售卖", trainCode, desc);
+            return -1L;
+        }
+        return remain;
     }
 }

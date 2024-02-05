@@ -3,19 +3,21 @@ package com.github.blkcor.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.github.blkcor.entity.DailyTrainTicket;
-import com.github.blkcor.entity.DailyTrainTicketExample;
-import com.github.blkcor.entity.TrainStation;
-import com.github.blkcor.entity.TrainStationExample;
+import com.github.blkcor.entity.*;
+import com.github.blkcor.enums.SeatTypeEnum;
+import com.github.blkcor.enums.TrainTypeEnum;
 import com.github.blkcor.mapper.DailyTrainTicketMapper;
+import com.github.blkcor.mapper.TrainMapper;
 import com.github.blkcor.mapper.TrainStationMapper;
 import com.github.blkcor.req.DailyTrainTicketQueryReq;
 import com.github.blkcor.req.DailyTrainTicketSaveReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.DailyTrainTicketQueryResp;
+import com.github.blkcor.service.DailyTrainSeatService;
 import com.github.blkcor.service.DailyTrainTicketService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -36,6 +38,10 @@ public class DailyTrainTicketServiceImpl implements DailyTrainTicketService {
     private DailyTrainTicketMapper dailyTrainTicketMapper;
     @Resource
     private TrainStationMapper trainStationMapper;
+    @Resource
+    private DailyTrainSeatService dailyTrainSeatService;
+    @Resource
+    private TrainMapper trainMapper;
 
     @Override
     public CommonResp<Void> saveDailyTrainTicket(DailyTrainTicketSaveReq dailyTrainTicketSaveReq) {
@@ -91,14 +97,27 @@ public class DailyTrainTicketServiceImpl implements DailyTrainTicketService {
         TrainStationExample trainStationExample = new TrainStationExample();
         trainStationExample.createCriteria().andTrainCodeEqualTo(code);
         List<TrainStation> trainStationList = trainStationMapper.selectByExample(trainStationExample);
+        //查询车次类型
+        TrainExample trainExample = new TrainExample();
+        trainExample.createCriteria().andCodeEqualTo(code);
+        List<Train> trainList = trainMapper.selectByExample(trainExample);
+        if (CollUtil.isEmpty(trainList)) {
+            LOG.info("车次{}没有找到对应的车次信息", code);
+            return CommonResp.fail("没有找到对应的车次信息");
+        }
+        String trainType = trainList.get(0).getType();
+        BigDecimal rate = EnumUtil.getFieldBy(TrainTypeEnum::getPriceRate, TrainTypeEnum::getCode, trainType);
         if (CollUtil.isEmpty(trainStationList)) {
             LOG.info("车次{}没有找到对应的车站信息", code);
             return CommonResp.fail("没有找到对应的车站信息");
         }
         for (int i = 0; i < trainStationList.size(); i++) {
             TrainStation trainStationStart = trainStationList.get(i);
+            BigDecimal distance = BigDecimal.ZERO;
             for (int j = i + 1; j < trainStationList.size(); j++) {
                 TrainStation trainStationEnd = trainStationList.get(j);
+                //计算两站之间的距离
+                distance = distance.add(trainStationEnd.getKm());
                 //生成车次余票信息
                 DailyTrainTicket dailyTrainTicket = new DailyTrainTicket();
                 dailyTrainTicket.setId(IdUtil.getSnowflake(1, 1).nextId());
@@ -112,17 +131,16 @@ public class DailyTrainTicketServiceImpl implements DailyTrainTicketService {
                 dailyTrainTicket.setEndPinyin(trainStationEnd.getNamePinyin());
                 dailyTrainTicket.setEndTime(trainStationEnd.getInTime());
                 dailyTrainTicket.setEndIndex(trainStationEnd.getIndex());
-                dailyTrainTicket.setYdz(0);
-                dailyTrainTicket.setYdzPrice(BigDecimal.ZERO);
-                dailyTrainTicket.setEdz(0);
-                dailyTrainTicket.setEdzPrice(BigDecimal.ZERO);
-                dailyTrainTicket.setRw(0);
-                dailyTrainTicket.setRwPrice(BigDecimal.ZERO);
-                dailyTrainTicket.setYw(0);
-                dailyTrainTicket.setYwPrice(BigDecimal.ZERO);
+                dailyTrainTicket.setYdz(dailyTrainSeatService.countSeat(date, code, "1").intValue());
+                dailyTrainTicket.setYdzPrice(rate.multiply(SeatTypeEnum.YDZ.getPrice()).multiply(distance));
+                dailyTrainTicket.setEdz(dailyTrainSeatService.countSeat(date, code, "2").intValue());
+                dailyTrainTicket.setEdzPrice(rate.multiply(SeatTypeEnum.EDZ.getPrice()).multiply(distance));
+                dailyTrainTicket.setRw(dailyTrainSeatService.countSeat(date, code, "3").intValue());
+                dailyTrainTicket.setRwPrice(rate.multiply(SeatTypeEnum.RW.getPrice()).multiply(distance));
+                dailyTrainTicket.setYw(dailyTrainSeatService.countSeat(date, code, "4").intValue());
+                dailyTrainTicket.setYwPrice(rate.multiply(SeatTypeEnum.YW.getPrice()).multiply(distance));
                 dailyTrainTicket.setCreateTime(DateTime.now());
                 dailyTrainTicket.setUpdateTime(DateTime.now());
-
             }
         }
 

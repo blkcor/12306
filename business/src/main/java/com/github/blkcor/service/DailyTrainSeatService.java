@@ -40,4 +40,13 @@ public interface DailyTrainSeatService {
      * @return 返回结果
      */
     CommonResp<Void> genDailyTrainSeat(Date date, String trainCode);
+
+    /**
+     * 查询每日车次座位信息
+     * @param date 日期
+     * @param trainCode 车次编号
+     * @param seatType 座位类型
+     * @return 返回结果
+     */
+    Long countSeat(Date date,String trainCode,String seatType);
 }
