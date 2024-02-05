@@ -61,7 +61,20 @@ public class DailyTrainTicketServiceImpl implements DailyTrainTicketService {
     @Override
     public CommonResp<PageResp<DailyTrainTicketQueryResp>> queryDailyTrainTicketList(DailyTrainTicketQueryReq dailyTrainTicketQueryReq) {
         DailyTrainTicketExample dailyTrainTicketExample = new DailyTrainTicketExample();
+        dailyTrainTicketExample.setOrderByClause("date asc, train_code asc");
         DailyTrainTicketExample.Criteria criteria = dailyTrainTicketExample.createCriteria();
+        if (ObjectUtil.isNotNull(dailyTrainTicketQueryReq.getDate())) {
+            criteria.andDateEqualTo(dailyTrainTicketQueryReq.getDate());
+        }
+        if (ObjectUtil.isNotNull(dailyTrainTicketQueryReq.getTrainCode())) {
+            criteria.andTrainCodeEqualTo(dailyTrainTicketQueryReq.getTrainCode());
+        }
+        if (ObjectUtil.isNotNull(dailyTrainTicketQueryReq.getStartStation())) {
+            criteria.andStartEqualTo(dailyTrainTicketQueryReq.getStartStation());
+        }
+        if (ObjectUtil.isNotNull(dailyTrainTicketQueryReq.getEndStation())) {
+            criteria.andEndEqualTo(dailyTrainTicketQueryReq.getEndStation());
+        }
 
         LOG.info("查询页码：{}", dailyTrainTicketQueryReq.getPage());
         LOG.info("查询条数：{}", dailyTrainTicketQueryReq.getSize());
@@ -109,7 +122,7 @@ public class DailyTrainTicketServiceImpl implements DailyTrainTicketService {
         BigDecimal rate = EnumUtil.getFieldBy(TrainTypeEnum::getPriceRate, TrainTypeEnum::getCode, trainType);
         if (CollUtil.isEmpty(trainStationList)) {
             LOG.info("车次{}没有找到对应的车站信息", code);
-            return CommonResp.fail("没有找到对应的车站信息");
+            return CommonResp.fail("没有找到车次对应的车站信息");
         }
         for (int i = 0; i < trainStationList.size(); i++) {
             TrainStation trainStationStart = trainStationList.get(i);
