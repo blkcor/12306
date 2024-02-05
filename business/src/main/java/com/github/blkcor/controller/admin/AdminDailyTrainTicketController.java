@@ -1,4 +1,4 @@
-package com.github.blkcor.controller;
+package com.github.blkcor.controller.admin;
 
 import com.github.blkcor.req.DailyTrainTicketQueryReq;
 import com.github.blkcor.req.DailyTrainTicketSaveReq;
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/dailyTrainTicket")
-public class DailyTrainTicketController {
+@RequestMapping("/admin/dailyTrainTicket")
+public class AdminDailyTrainTicketController {
     @Resource
     private DailyTrainTicketService dailyTrainTicketService;
 
