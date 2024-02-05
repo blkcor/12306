@@ -13,10 +13,7 @@ import com.github.blkcor.req.DailyTrainSaveReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.DailyTrainQueryResp;
-import com.github.blkcor.service.DailyTrainCarriageService;
-import com.github.blkcor.service.DailyTrainSeatService;
-import com.github.blkcor.service.DailyTrainService;
-import com.github.blkcor.service.DailyTrainStationService;
+import com.github.blkcor.service.*;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
@@ -24,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -42,6 +40,8 @@ public class DailyTrainServiceImpl implements DailyTrainService {
     private DailyTrainCarriageService dailyTrainCarriageService;
     @Resource
     private DailyTrainSeatService dailyTrainSeatService;
+    @Resource
+    private DailyTrainTicketService dailyTrainTicketService;
 
     @Override
     public CommonResp<Void> saveDailyTrain(DailyTrainSaveReq dailyTrainSaveReq) {
@@ -98,7 +98,7 @@ public class DailyTrainServiceImpl implements DailyTrainService {
 
     @Override
     public CommonResp<Void> genDaily(Date date) {
-        LOG.info("生成{}的车次信息，任务开始", date);
+        LOG.info("生成{}的每日车次信息，任务开始", date);
         //查询所有的车次信息
         TrainExample trainExample = new TrainExample();
         trainExample.setOrderByClause("code asc");
@@ -109,11 +109,13 @@ public class DailyTrainServiceImpl implements DailyTrainService {
         }
         //生成车次，车厢，座位信息
         trainList.forEach(train -> genDailyTrain(date, train));
-        LOG.info("生成{}的车次信息，任务结束", date);
+        LOG.info("生成{}的每日车次信息，任务结束", date);
         return CommonResp.success(null);
     }
 
-    private void genDailyTrain(Date date, Train train) {
+
+    @Transactional
+    public void genDailyTrain(Date date, Train train) {
         //清空每日车次数据
         DailyTrainExample dailyTrainExample = new DailyTrainExample();
         dailyTrainExample.createCriteria()
@@ -134,5 +136,7 @@ public class DailyTrainServiceImpl implements DailyTrainService {
         dailyTrainCarriageService.genDailyTrainCarriage(date, train.getCode());
         //生成每日座位数据
         dailyTrainSeatService.genDailyTrainSeat(date, train.getCode());
+        //生成每日余票数据
+        dailyTrainTicketService.genDailyTrainTicket(date, train.getCode());
     }
 }
