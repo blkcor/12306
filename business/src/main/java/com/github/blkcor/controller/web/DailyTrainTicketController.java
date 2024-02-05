@@ -1,7 +1,6 @@
 package com.github.blkcor.controller.web;
 
 import com.github.blkcor.req.DailyTrainTicketQueryReq;
-import com.github.blkcor.req.DailyTrainTicketSaveReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.DailyTrainTicketQueryResp;
 import com.github.blkcor.resp.PageResp;
