@@ -3,7 +3,6 @@ package com.github.blkcor.job;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.github.blkcor.feign.BusinessFeign;
-import com.github.blkcor.resp.CommonResp;
 import jakarta.annotation.Resource;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
