@@ -8,7 +8,7 @@
     </parent>
     <groupId>com.github.blkcor</groupId>
     <artifactId>batch</artifactId>
-    <name>Archetype - batch</name>
+    <name>batch</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>

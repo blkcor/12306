@@ -127,7 +127,11 @@
 <!--               enableCountByExample="true" enableDeleteByExample="true" enableSelectByExample="true"-->
 <!--               enableUpdateByExample="true" selectByExampleQueryId="true">-->
 <!--        </table>-->
-        <table schema="" tableName="daily_train_ticket" domainObjectName="DailyTrainTicket"
+<!--        <table schema="" tableName="daily_train_ticket" domainObjectName="DailyTrainTicket"-->
+<!--               enableCountByExample="true" enableDeleteByExample="true" enableSelectByExample="true"-->
+<!--               enableUpdateByExample="true" selectByExampleQueryId="true">-->
+<!--        </table>-->
+        <table schema="" tableName="confirm_order" domainObjectName="ConfirmOrder"
                enableCountByExample="true" enableDeleteByExample="true" enableSelectByExample="true"
                enableUpdateByExample="true" selectByExampleQueryId="true">
         </table>
