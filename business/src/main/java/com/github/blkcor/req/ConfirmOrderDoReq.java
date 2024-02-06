@@ -2,7 +2,10 @@ package com.github.blkcor.req;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,16 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ConfirmOrderSaveReq {
-    /**
-     * id
-     */
-    private Long id;
-    /**
-     * 会员id
-     */
-    @NotNull(message = "会员id不能为空")
-    private Long memberId;
+public class ConfirmOrderDoReq {
     /**
      * 日期
      */
@@ -51,19 +45,6 @@ public class ConfirmOrderSaveReq {
     /**
      * 购票信息
      */
-    @NotBlank(message = "购票信息不能为空")
-    private String tickets;
-    /**
-     * 订单状态|枚举[ConfirmOrderStatusEnum]
-     */
-    @NotBlank(message = "订单状态不能为空")
-    private String status;
-    /**
-     * 新增时间
-     */
-    private String createTime;
-    /**
-     * 更新时间
-     */
-    private String updateTime;
+    @NotEmpty(message = "购票信息不能为空")
+    private List<ConfirmOrderTicketReq> tickets;
 }

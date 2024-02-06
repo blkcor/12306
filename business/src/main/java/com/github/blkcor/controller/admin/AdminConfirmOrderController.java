@@ -1,10 +1,10 @@
-package com.github.blkcor.controller;
+package com.github.blkcor.controller.admin;
 
+import com.github.blkcor.req.ConfirmOrderDoReq;
 import com.github.blkcor.req.ConfirmOrderQueryReq;
-import com.github.blkcor.req.ConfirmOrderSaveReq;
 import com.github.blkcor.resp.CommonResp;
-import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.ConfirmOrderQueryResp;
+import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.service.ConfirmOrderService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/confirmOrder")
-public class ConfirmOrderController {
+@RequestMapping("/admin/confirmOrder")
+public class AdminConfirmOrderController {
     @Resource
     private ConfirmOrderService confirmOrderService;
 
     @PostMapping("/save")
-    public CommonResp<Void> saveConfirmOrder(@RequestBody  @Valid ConfirmOrderSaveReq confirmOrderSaveReq) {
+    public CommonResp<Void> saveConfirmOrder(@RequestBody  @Valid ConfirmOrderDoReq confirmOrderSaveReq) {
         return confirmOrderService.saveConfirmOrder(confirmOrderSaveReq);
     }
 
@@ -28,7 +28,7 @@ public class ConfirmOrderController {
     }
 
     @PutMapping("/update")
-    public CommonResp<Void> updateConfirmOrder(@RequestBody @Valid ConfirmOrderSaveReq confirmOrderSaveReq) {
+    public CommonResp<Void> updateConfirmOrder(@RequestBody @Valid ConfirmOrderDoReq confirmOrderSaveReq) {
         return confirmOrderService.saveConfirmOrder(confirmOrderSaveReq);
     }
 

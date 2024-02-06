@@ -1,7 +1,7 @@
 package com.github.blkcor.service;
 
 import com.github.blkcor.req.ConfirmOrderQueryReq;
-import com.github.blkcor.req.ConfirmOrderSaveReq;
+import com.github.blkcor.req.ConfirmOrderDoReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.ConfirmOrderQueryResp;
@@ -14,7 +14,7 @@ public interface ConfirmOrderService {
      * @param confirmOrderSaveReq 请求参数
      * @return 返回结果
      */
-    CommonResp<Void> saveConfirmOrder(ConfirmOrderSaveReq confirmOrderSaveReq);
+    CommonResp<Void> saveConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq);
 
     /**
      * 查询确认订单列表
@@ -30,4 +30,11 @@ public interface ConfirmOrderService {
      * @return 返回结果
      */
     CommonResp<Void> deleteConfirmOrder(Long id);
+
+    /**
+     * 执行确认订单
+     * @param confirmOrderSaveReq 请求参数
+     * @return 返回结果
+     */
+    CommonResp<Void> doConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq);
 }
