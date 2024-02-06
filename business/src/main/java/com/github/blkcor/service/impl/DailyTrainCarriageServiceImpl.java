@@ -105,6 +105,13 @@ public class DailyTrainCarriageServiceImpl implements DailyTrainCarriageService 
         return CommonResp.success(null);
     }
 
+    @Override
+    public List<DailyTrainCarriage> selectBySeatType(String trainCode, Date date, String seatType) {
+        DailyTrainCarriageExample dailyTrainCarriageExample = new DailyTrainCarriageExample();
+        dailyTrainCarriageExample.createCriteria().andDateEqualTo(date).andTrainCodeEqualTo(trainCode).andSeatTypeEqualTo(seatType);
+        return dailyTrainCarriageMapper.selectByExample(dailyTrainCarriageExample);
+    }
+
     private void genDailyCarriage(Date date, TrainCarriage trainCarriage) {
         DailyTrainCarriage dailyTrainCarriage = BeanUtil.copyProperties(trainCarriage, DailyTrainCarriage.class);
         dailyTrainCarriage.setDate(date);

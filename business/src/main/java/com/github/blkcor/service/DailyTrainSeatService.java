@@ -1,5 +1,6 @@
 package com.github.blkcor.service;
 
+import com.github.blkcor.entity.DailyTrainSeat;
 import com.github.blkcor.req.DailyTrainSeatQueryReq;
 import com.github.blkcor.req.DailyTrainSeatSaveReq;
 import com.github.blkcor.resp.CommonResp;
@@ -7,6 +8,7 @@ import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.DailyTrainSeatQueryResp;
 
 import java.util.Date;
+import java.util.List;
 
 
 public interface DailyTrainSeatService {
@@ -49,4 +51,6 @@ public interface DailyTrainSeatService {
      * @return 返回结果
      */
     Long countSeat(Date date,String trainCode,String seatType);
+
+    List<DailyTrainSeat> selectByCarriageIndex(String trainCode, Date date, Integer carriageIndex);
 }

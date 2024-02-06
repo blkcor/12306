@@ -121,4 +121,11 @@ public class DailyTrainSeatServiceImpl implements DailyTrainSeatService {
         }
         return remain;
     }
+
+    @Override
+    public List<DailyTrainSeat> selectByCarriageIndex(String trainCode, Date date, Integer carriageIndex) {
+        DailyTrainSeatExample dailyTrainSeatExample = new DailyTrainSeatExample();
+        dailyTrainSeatExample.createCriteria().andDateEqualTo(date).andTrainCodeEqualTo(trainCode).andCarriageIndexEqualTo(carriageIndex);
+        return dailyTrainSeatMapper.selectByExample(dailyTrainSeatExample);
+    }
 }

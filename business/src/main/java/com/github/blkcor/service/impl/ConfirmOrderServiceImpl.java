@@ -5,25 +5,28 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.blkcor.context.LoginMemberContext;
-import com.github.blkcor.entity.ConfirmOrder;
-import com.github.blkcor.entity.ConfirmOrderExample;
-import com.github.blkcor.entity.DailyTrainTicket;
-import com.github.blkcor.entity.DailyTrainTicketExample;
+import com.github.blkcor.entity.*;
 import com.github.blkcor.enums.ConfirmOrderStatusEnum;
+import com.github.blkcor.enums.SeatColEnum;
 import com.github.blkcor.enums.SeatTypeEnum;
 import com.github.blkcor.exception.BusinessException;
 import com.github.blkcor.exception.BusinessExceptionEnum;
 import com.github.blkcor.mapper.ConfirmOrderMapper;
+import com.github.blkcor.mapper.DailyTrainCarriageMapper;
 import com.github.blkcor.mapper.DailyTrainTicketMapper;
 import com.github.blkcor.req.ConfirmOrderQueryReq;
 import com.github.blkcor.req.ConfirmOrderDoReq;
+import com.github.blkcor.req.ConfirmOrderTicketReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.ConfirmOrderQueryResp;
 import com.github.blkcor.service.ConfirmOrderService;
+import com.github.blkcor.service.DailyTrainCarriageService;
+import com.github.blkcor.service.DailyTrainSeatService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
@@ -31,7 +34,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -41,6 +47,10 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
     private ConfirmOrderMapper confirmOrderMapper;
     @Resource
     private DailyTrainTicketMapper dailyTrainTicketMapper;
+    @Resource
+    private DailyTrainCarriageService dailyTrainCarriageService;
+    @Resource
+    private DailyTrainSeatService dailyTrainSeatService;
 
     @Override
     public CommonResp<Void> saveConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq) {
@@ -114,7 +124,48 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
         //3、扣减余票数量，判断余票是否足够
         reduceTicketStore(confirmOrderSaveReq, dailyTrainTicket);
         //4、选座
-        //4.1、按车厢一个一个获取座位信息
+        //判断是否有选座
+        if (StrUtil.isBlank(confirmOrderSaveReq.getTickets().get(0).getSeat())) {
+            LOG.info("本次购票未选座");
+            //系统选座，需要一个个的选
+            confirmOrderSaveReq.getTickets().forEach(ticket -> {
+                getSeat(confirmOrderSaveReq.getTrainCode(),
+                        confirmOrderSaveReq.getDate(),
+                        ticket.getSeatTypeCode(),
+                        null,
+                        null);
+            });
+        } else {
+            LOG.info("本次购票选座");
+            List<SeatColEnum> colEnumList = SeatColEnum.getColsByType(confirmOrderSaveReq.getTickets().get(0).getSeatTypeCode());
+            LOG.info("本次购票选座列信息：{}", JSONUtil.toJsonStr(colEnumList));
+            //组成A1,C1,D1,F1,A2,C2,D2,F2这种格式的座位信息，只生成两排座位信息
+            List<String> referSeatList = new ArrayList<>();
+            for (int i = 1; i <= 2; i++) {
+                for (SeatColEnum seatColEnum : colEnumList) {
+                    referSeatList.add(seatColEnum.getCode() + i);
+                }
+            }
+            LOG.info("本次购票参照座位信息：{}", JSONUtil.toJsonStr(referSeatList));
+            //获取偏移值数组
+            List<Integer> offsetList = new ArrayList<>();
+            referSeatList.stream()
+                    .filter(confirmOrderSaveReq.getTickets().stream().map(ConfirmOrderTicketReq::getSeat).toList()::contains)
+                    .map(referSeatList::indexOf)
+                    .forEach(offsetList::add);
+            List<Integer> normalizedOffsetList = offsetList
+                    .stream()
+                    .map(position -> position - offsetList.get(0))
+                    .toList();
+            LOG.info("计算得到座位的偏移值：{}", JSONUtil.toJsonStr(normalizedOffsetList));
+            //4.1、按车厢一个一个获取座位信息
+            getSeat(confirmOrderSaveReq.getTrainCode(),
+                    confirmOrderSaveReq.getDate(),
+                    confirmOrderSaveReq.getTickets().get(0).getSeatTypeCode(),
+                    confirmOrderSaveReq.getTickets().get(0).getSeat().substring(0, 1),
+                    normalizedOffsetList);
+        }
+
 
         //4.2、判断座位是否可用（是否被买过，是否满足乘客的选座要求，多个选座应该在同一个车厢）
 
@@ -125,6 +176,17 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
         //5.4、更新订单表状态为成功
 
         return null;
+    }
+
+    public void getSeat(String trainCode, Date date, String seatType, String colType, List<Integer> offsetList) {
+        //4.1、按车厢一个一个获取座位信息
+        List<DailyTrainCarriage> carriageList = dailyTrainCarriageService.selectBySeatType(trainCode, date, seatType);
+        LOG.info("共查出{}个符合条件的车厢", carriageList.size());
+        carriageList.forEach(carriage -> {
+            LOG.info("开始从车厢{}寻找座位", carriage.getIndex());
+            List<DailyTrainSeat> trainSeatList = dailyTrainSeatService.selectByCarriageIndex(trainCode, date, carriage.getIndex());
+            LOG.info("车厢{}共查出{}个座位", carriage.getIndex(), trainSeatList.size());
+        });
     }
 
     private static void reduceTicketStore(ConfirmOrderDoReq confirmOrderSaveReq, DailyTrainTicket dailyTrainTicket) {
