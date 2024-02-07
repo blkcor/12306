@@ -1,6 +1,7 @@
 package com.github.blkcor.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.*;
 import cn.hutool.json.JSONUtil;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -160,29 +162,59 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
         return null;
     }
 
-    public DailyTrainSeat getSeat(DailyTrainTicket dailyTrainTicket, String trainCode, Date date, String seatType, String colType, List<Integer> offsetList) {
+    public void getSeat(DailyTrainTicket dailyTrainTicket, String trainCode, Date date, String seatType, String colType, List<Integer> offsetList) {
         //4.1、按车厢一个一个获取座位信息
         List<DailyTrainCarriage> carriageList = dailyTrainCarriageService.selectBySeatType(trainCode, date, seatType);
         LOG.info("共查出{}个符合条件的车厢", carriageList.size());
-        AtomicReference<DailyTrainSeat> selectedSeat = new AtomicReference<>();
-        carriageList.forEach(carriage -> {
+        for(DailyTrainCarriage carriage: carriageList) {
             LOG.info("开始从车厢{}寻找座位", carriage.getIndex());
             List<DailyTrainSeat> trainSeatList = dailyTrainSeatService.selectByCarriageIndex(trainCode, date, carriage.getIndex());
             LOG.info("车厢{}共查出{}个座位", carriage.getIndex(), trainSeatList.size());
-            trainSeatList.stream().anyMatch(trainSeat -> {
-                Boolean canSell = canSell(trainSeat, dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
-                //根据offsetList判断选中的其他座位是否可售
-                if(canSell){
-                    selectedSeat.set(trainSeat);
-                    LOG.info("选中座位：{}",trainSeat);
-                    return true;
-                }else{
-                    LOG.info("未选中座位：{}",trainSeat);
-                    return false;
+            for (DailyTrainSeat trainSeat : trainSeatList) {
+                //如果colType有值，表示是选座，先判断列号是否满足
+                if (StrUtil.isNotBlank(colType)) {
+                    if (!trainSeat.getCol().equals(colType)) {
+                        LOG.info("座位{}列号{}不满足要求{}", trainSeat.getCarriageSeatIndex(), trainSeat.getCol(), colType);
+                        continue;
+                    }
                 }
-            });
-        });
-        return selectedSeat.get();
+                Boolean canSell = canSell(trainSeat, dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
+                if (canSell) {
+                    LOG.info("选中座位：{}", trainSeat);
+                } else {
+                    LOG.info("未选中座位：{}，当前座位不可售", trainSeat);
+                    continue;
+                }
+                boolean isGetAllOffsetSeat = true;
+                //根据offsetList判断选中的其他座位是否可售
+                if (CollUtil.isNotEmpty(offsetList)) {
+                    LOG.info("有偏移值{},开始判断其他座位是否可售", offsetList);
+                    for (Integer offset : offsetList) {
+                        Integer seatIndex = trainSeat.getCarriageSeatIndex();
+                        int nextIndex = seatIndex + offset - 1;
+                        //判断偏移值是否合法
+                        if(nextIndex > trainSeatList.size()) {
+                            LOG.info("偏移值{}超出车厢座位数量{}", offset, trainSeatList.size());
+                            isGetAllOffsetSeat = false;
+                            break;
+                        }
+                        //判断是否可选
+                        DailyTrainSeat nextSeat = trainSeatList.get(nextIndex);
+                        if (canSell(nextSeat, dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex())) {
+                            LOG.info("选中座位：{}", nextSeat.getCarriageSeatIndex());
+                        } else {
+                            LOG.info("未选中座位：{}，当前座位不可售", nextSeat.getCarriageSeatIndex());
+                            isGetAllOffsetSeat = false;
+                            break;
+                        }
+                    }
+                }
+                //从当前车厢下一个座位开始进行判断
+                if(!isGetAllOffsetSeat) continue;
+                //都选中了，我们需要保存选好的座位
+                return;
+            }
+        }
     }
 
     /**
