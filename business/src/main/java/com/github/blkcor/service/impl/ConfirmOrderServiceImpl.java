@@ -122,12 +122,14 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
         //3、扣减余票数量，判断余票是否足够
         reduceTicketStore(confirmOrderSaveReq, dailyTrainTicket);
         //4、选座
+        //最终的选座结果
+        List<DailyTrainSeat> finalSeatList = new ArrayList<>();
         //判断是否有选座
         if (StrUtil.isBlank(confirmOrderSaveReq.getTickets().get(0).getSeat())) {
             LOG.info("本次购票未选座");
             //系统选座，需要一个个的选
             confirmOrderSaveReq.getTickets().forEach(ticket -> {
-                getSeat(dailyTrainTicket, confirmOrderSaveReq.getTrainCode(), confirmOrderSaveReq.getDate(), ticket.getSeatTypeCode(), null, null);
+                getSeat(finalSeatList, dailyTrainTicket, confirmOrderSaveReq.getTrainCode(), confirmOrderSaveReq.getDate(), ticket.getSeatTypeCode(), null, null);
             });
         } else {
             LOG.info("本次购票选座");
@@ -147,11 +149,10 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
             List<Integer> normalizedOffsetList = offsetList.stream().map(position -> position - offsetList.get(0)).toList();
             LOG.info("计算得到座位的偏移值：{}", JSONUtil.toJsonStr(normalizedOffsetList));
             //4.1、按车厢一个一个获取座位信息
-            getSeat(dailyTrainTicket, confirmOrderSaveReq.getTrainCode(), confirmOrderSaveReq.getDate(), confirmOrderSaveReq.getTickets().get(0).getSeatTypeCode(), confirmOrderSaveReq.getTickets().get(0).getSeat().substring(0, 1), normalizedOffsetList);
+            //4.2、判断座位是否可用（是否被买过，是否满足乘客的选座要求，多个选座应该在同一个车厢）
+            getSeat(finalSeatList, dailyTrainTicket, confirmOrderSaveReq.getTrainCode(), confirmOrderSaveReq.getDate(), confirmOrderSaveReq.getTickets().get(0).getSeatTypeCode(), confirmOrderSaveReq.getTickets().get(0).getSeat().substring(0, 1), normalizedOffsetList);
+            LOG.info("最终选中的座位：{}", JSONUtil.toJsonStr(finalSeatList));
         }
-
-
-        //4.2、判断座位是否可用（是否被买过，是否满足乘客的选座要求，多个选座应该在同一个车厢）
 
         //5、事务处理
         //5.1、座位表修改售卖情况
@@ -162,15 +163,22 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
         return null;
     }
 
-    public void getSeat(DailyTrainTicket dailyTrainTicket, String trainCode, Date date, String seatType, String colType, List<Integer> offsetList) {
+    public void getSeat(List<DailyTrainSeat> finalSeatList, DailyTrainTicket dailyTrainTicket, String trainCode, Date date, String seatType, String colType, List<Integer> offsetList) {
         //4.1、按车厢一个一个获取座位信息
         List<DailyTrainCarriage> carriageList = dailyTrainCarriageService.selectBySeatType(trainCode, date, seatType);
+        List<DailyTrainSeat> getSeatList;
         LOG.info("共查出{}个符合条件的车厢", carriageList.size());
-        for(DailyTrainCarriage carriage: carriageList) {
+        for (DailyTrainCarriage carriage : carriageList) {
+            getSeatList = new ArrayList<>();
             LOG.info("开始从车厢{}寻找座位", carriage.getIndex());
             List<DailyTrainSeat> trainSeatList = dailyTrainSeatService.selectByCarriageIndex(trainCode, date, carriage.getIndex());
             LOG.info("车厢{}共查出{}个座位", carriage.getIndex(), trainSeatList.size());
             for (DailyTrainSeat trainSeat : trainSeatList) {
+                //判断座位是否重复选中
+                if (finalSeatList.stream().map(DailyTrainSeat::getId).toList().contains(trainSeat.getId())) {
+                    LOG.info("座位{}已被重复选中，跳过该座位", trainSeat.getCarriageSeatIndex());
+                    continue;
+                }
                 //如果colType有值，表示是选座，先判断列号是否满足
                 if (StrUtil.isNotBlank(colType)) {
                     if (!trainSeat.getCol().equals(colType)) {
@@ -181,6 +189,7 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
                 Boolean canSell = canSell(trainSeat, dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
                 if (canSell) {
                     LOG.info("选中座位：{}", trainSeat);
+                    getSeatList.add(trainSeat);
                 } else {
                     LOG.info("未选中座位：{}，当前座位不可售", trainSeat);
                     continue;
@@ -193,7 +202,7 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
                         Integer seatIndex = trainSeat.getCarriageSeatIndex();
                         int nextIndex = seatIndex + offset - 1;
                         //判断偏移值是否合法
-                        if(nextIndex > trainSeatList.size()) {
+                        if (nextIndex > trainSeatList.size()) {
                             LOG.info("偏移值{}超出车厢座位数量{}", offset, trainSeatList.size());
                             isGetAllOffsetSeat = false;
                             break;
@@ -202,6 +211,7 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
                         DailyTrainSeat nextSeat = trainSeatList.get(nextIndex);
                         if (canSell(nextSeat, dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex())) {
                             LOG.info("选中座位：{}", nextSeat.getCarriageSeatIndex());
+                            getSeatList.add(nextSeat);
                         } else {
                             LOG.info("未选中座位：{}，当前座位不可售", nextSeat.getCarriageSeatIndex());
                             isGetAllOffsetSeat = false;
@@ -210,8 +220,12 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
                     }
                 }
                 //从当前车厢下一个座位开始进行判断
-                if(!isGetAllOffsetSeat) continue;
+                if (!isGetAllOffsetSeat) {
+                    getSeatList.clear();
+                    continue;
+                }
                 //都选中了，我们需要保存选好的座位
+                finalSeatList.addAll(getSeatList);
                 return;
             }
         }
@@ -231,7 +245,7 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
             return false;
         } else {
             LOG.info("未售过票，可选中该座位");
-            String curSell = sellPart.replace("0", "1");
+            String curSell = sellPart.replace('0', '1');
             //用0填充成原来的长度
             curSell = StrUtil.fillBefore(curSell, '0', endIndex);
             curSell = StrUtil.fillAfter(curSell, '0', sell.length());
@@ -242,6 +256,7 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
             //fill again
             finalSell = StrUtil.fillBefore(finalSell, '0', sell.length());
             LOG.info("座位{}被选中，原售票信息为:{}, 车站区间{}~{}，即：{},最终售票信息为:{}", dailyTrainSeat.getCarriageSeatIndex(), sell, startIndex, endIndex, sellPart, finalSell);
+            dailyTrainSeat.setSell(finalSell);
             return true;
         }
     }
