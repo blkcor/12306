@@ -21,6 +21,7 @@ import com.github.blkcor.req.ConfirmOrderTicketReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.ConfirmOrderQueryResp;
+import com.github.blkcor.service.AfterConfirmOrderService;
 import com.github.blkcor.service.ConfirmOrderService;
 import com.github.blkcor.service.DailyTrainCarriageService;
 import com.github.blkcor.service.DailyTrainSeatService;
@@ -49,6 +50,8 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
     private DailyTrainCarriageService dailyTrainCarriageService;
     @Resource
     private DailyTrainSeatService dailyTrainSeatService;
+    @Resource
+    private AfterConfirmOrderService afterConfirmOrderService;
 
     @Override
     public CommonResp<Void> saveConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq) {
@@ -151,11 +154,11 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
             //4.1、按车厢一个一个获取座位信息
             //4.2、判断座位是否可用（是否被买过，是否满足乘客的选座要求，多个选座应该在同一个车厢）
             getSeat(finalSeatList, dailyTrainTicket, confirmOrderSaveReq.getTrainCode(), confirmOrderSaveReq.getDate(), confirmOrderSaveReq.getTickets().get(0).getSeatTypeCode(), confirmOrderSaveReq.getTickets().get(0).getSeat().substring(0, 1), normalizedOffsetList);
-            LOG.info("最终选中的座位：{}", JSONUtil.toJsonStr(finalSeatList));
         }
-
+        LOG.info("最终选中的座位：{}", JSONUtil.toJsonStr(finalSeatList));
         //5、事务处理
         //5.1、座位表修改售卖情况
+        afterConfirmOrderService.afterDoConfirmOrder(finalSeatList);
         //5.2、余票表修改库存
         //5.3、为会员增加购票记录
         //5.4、更新订单表状态为成功
