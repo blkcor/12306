@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.blkcor.mapper.custom.DailyTrainTicketMapperCustom">
+    <resultMap id="BaseResultMap" type="com.github.blkcor.entity.DailyTrainTicket">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="date" jdbcType="DATE" property="date"/>
+        <result column="train_code" jdbcType="VARCHAR" property="trainCode"/>
+        <result column="start" jdbcType="VARCHAR" property="start"/>
+        <result column="start_pinyin" jdbcType="VARCHAR" property="startPinyin"/>
+        <result column="start_time" jdbcType="TIME" property="startTime"/>
+        <result column="start_index" jdbcType="INTEGER" property="startIndex"/>
+        <result column="end" jdbcType="VARCHAR" property="end"/>
+        <result column="end_pinyin" jdbcType="VARCHAR" property="endPinyin"/>
+        <result column="end_time" jdbcType="TIME" property="endTime"/>
+        <result column="end_index" jdbcType="INTEGER" property="endIndex"/>
+        <result column="ydz" jdbcType="INTEGER" property="ydz"/>
+        <result column="ydz_price" jdbcType="DECIMAL" property="ydzPrice"/>
+        <result column="edz" jdbcType="INTEGER" property="edz"/>
+        <result column="edz_price" jdbcType="DECIMAL" property="edzPrice"/>
+        <result column="rw" jdbcType="INTEGER" property="rw"/>
+        <result column="rw_price" jdbcType="DECIMAL" property="rwPrice"/>
+        <result column="yw" jdbcType="INTEGER" property="yw"/>
+        <result column="yw_price" jdbcType="DECIMAL" property="ywPrice"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <update id="updateCountBySell">
+        update daily_train_ticket set
+        <if test="seatTypeCode == '1',toString()">
+            ydz = ydz - 1
+        </if>
+        <if test="seatTypeCode == '2',toString()">
+            edz = edz - 1
+        </if>
+        <if test="seatTypeCode == '3',toString()">
+            rw = rw - 1
+        </if>
+        <if test="seatTypeCode == '4',toString()">
+            yw = yw - 1
+        </if>
+        where `date` = #{date}
+        and start_index <= #{maxStartIndex}
+        and start_index >= #{minStartIndex}
+        and end_index >= #{minEndIndex}
+        and end_index <= #{maxEndIndex}
+    </update>
+</mapper>

@@ -158,7 +158,7 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
         LOG.info("最终选中的座位：{}", JSONUtil.toJsonStr(finalSeatList));
         //5、事务处理
         //5.1、座位表修改售卖情况
-        afterConfirmOrderService.afterDoConfirmOrder(finalSeatList);
+        afterConfirmOrderService.afterDoConfirmOrder(dailyTrainTicket,finalSeatList);
         //5.2、余票表修改库存
         //5.3、为会员增加购票记录
         //5.4、更新订单表状态为成功
