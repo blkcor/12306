@@ -24,3 +24,6 @@ logging:
       github:
         blkcor:
           mapper: trace
+
+test:
+  name: rainbow

@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        #最终会读取的配置文件的名称为：member-dev.yml
+        server-addr: http://127.0.0.1:8848/
+        file-extension: yml
+  application:
+    name: member
+  profiles:
+    active: dev

@@ -39,9 +39,9 @@
             yw = yw - 1
         </if>
         where `date` = #{date}
-        and start_index <= #{maxStartIndex}
+        and  #{maxStartIndex} >= start_index
         and start_index >= #{minStartIndex}
         and end_index >= #{minEndIndex}
-        and end_index <= #{maxEndIndex}
+        and  #{maxEndIndex} >= end_index
     </update>
 </mapper>
