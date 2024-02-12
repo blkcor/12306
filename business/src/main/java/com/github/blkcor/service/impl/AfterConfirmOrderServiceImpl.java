@@ -1,9 +1,15 @@
 package com.github.blkcor.service.impl;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.IdUtil;
+import com.github.blkcor.context.LoginMemberContext;
 import com.github.blkcor.entity.DailyTrainSeat;
 import com.github.blkcor.entity.DailyTrainTicket;
+import com.github.blkcor.feign.MemberFeign;
 import com.github.blkcor.mapper.DailyTrainSeatMapper;
 import com.github.blkcor.mapper.custom.DailyTrainTicketMapperCustom;
+import com.github.blkcor.req.ConfirmOrderDoReq;
+import com.github.blkcor.req.MemberTicketSaveReq;
 import com.github.blkcor.service.AfterConfirmOrderService;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
@@ -21,22 +27,25 @@ public class AfterConfirmOrderServiceImpl implements AfterConfirmOrderService {
     private DailyTrainSeatMapper dailyTrainSeatMapper;
     @Resource
     private DailyTrainTicketMapperCustom dailyTrainTicketMapperCustom;
+    @Resource
+    private MemberFeign memberFeign;
 
     @Override
     @Transactional
-    public void afterDoConfirmOrder(DailyTrainTicket dailyTrainTicket, List<DailyTrainSeat> finalSeatList) {
+    public void afterDoConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq, DailyTrainTicket dailyTrainTicket, List<DailyTrainSeat> finalSeatList) {
         Integer startIndex = dailyTrainTicket.getStartIndex();
         Integer endIndex = dailyTrainTicket.getEndIndex();
-        finalSeatList.forEach(seat -> {
+        for (int j = 0; j < finalSeatList.size(); j++) {
+            DailyTrainSeat seat = finalSeatList.get(j);
             DailyTrainSeat dailyTrainSeatForUpdate = new DailyTrainSeat();
             dailyTrainSeatForUpdate.setId(seat.getId());
             dailyTrainSeatForUpdate.setSell(seat.getSell());
             dailyTrainSeatMapper.updateByPrimaryKeySelective(dailyTrainSeatForUpdate);
 
             char[] sellInfo = dailyTrainSeatForUpdate.getSell().toCharArray();
-            Integer maxStartIndex = endIndex - 1;
-            Integer minStartIndex = 0;
-            Integer minEndIndex = startIndex + 1;
+            int maxStartIndex = endIndex - 1;
+            int minStartIndex = 0;
+            int minEndIndex = startIndex + 1;
             //计算min max的时候需要考虑好边界情况，可以在实际买票的时候进行测试调整
             for (int i = startIndex - 1; i >= 0; i--) {
                 if (sellInfo[i] == '1') {
@@ -45,7 +54,7 @@ public class AfterConfirmOrderServiceImpl implements AfterConfirmOrderService {
                 }
             }
             LOG.info("影响的出发站区间:" + minStartIndex + "-" + maxStartIndex);
-            Integer maxEndIndex = seat.getSeatType().length();
+            int maxEndIndex = seat.getSeatType().length();
             for (int i = endIndex; i < sellInfo.length; i++) {
                 if (sellInfo[i] == '1') {
                     maxEndIndex = i;
@@ -54,10 +63,25 @@ public class AfterConfirmOrderServiceImpl implements AfterConfirmOrderService {
             }
             LOG.info("影响的到达站区间:" + minEndIndex + "-" + maxEndIndex);
             dailyTrainTicketMapperCustom.updateCountBySell(seat.getSeatType(), seat.getTrainCode(), seat.getDate(), minStartIndex, maxStartIndex, minEndIndex, maxEndIndex);
-        });
+            MemberTicketSaveReq memberTicketSaveReq = new MemberTicketSaveReq();
+            memberTicketSaveReq.setId(IdUtil.getSnowflake(1, 1).nextId());
+            memberTicketSaveReq.setMemberId(LoginMemberContext.getId());
+            memberTicketSaveReq.setPassengerId(confirmOrderSaveReq.getTickets().get(j).getPassengerId());
+            memberTicketSaveReq.setPassengerName(confirmOrderSaveReq.getTickets().get(j).getPassengerName());
+            memberTicketSaveReq.setDate(seat.getDate());
+            memberTicketSaveReq.setTrainCode(seat.getTrainCode());
+            memberTicketSaveReq.setCarriageIndex(seat.getCarriageIndex());
+            memberTicketSaveReq.setRow(seat.getRow());
+            memberTicketSaveReq.setCol(seat.getCol());
+            memberTicketSaveReq.setStart(dailyTrainTicket.getStart());
+            memberTicketSaveReq.setStartTime(dailyTrainTicket.getStartTime());
+            memberTicketSaveReq.setEnd(dailyTrainTicket.getEnd());
+            memberTicketSaveReq.setEndTime(dailyTrainTicket.getEndTime());
+            memberTicketSaveReq.setSeatType(seat.getSeatType());
+            memberTicketSaveReq.setCreateTime(DateTime.now());
+            memberTicketSaveReq.setUpdateTime(DateTime.now());
 
-
+            memberFeign.save(memberTicketSaveReq);
+        }
     }
-
-
 }

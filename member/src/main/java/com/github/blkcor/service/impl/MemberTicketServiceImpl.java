@@ -31,16 +31,11 @@ public class MemberTicketServiceImpl implements MemberTicketService {
 
     @Override
     public CommonResp<Void> saveMemberTicket(MemberTicketSaveReq memberTicketSaveReq) {
-        MemberTicket memberTicket  = BeanUtil.copyProperties(memberTicketSaveReq, MemberTicket.class);
-        if(ObjectUtil.isNull(memberTicket.getId())){
-            memberTicket.setCreateTime(DateTime.now());
-            memberTicket.setUpdateTime(DateTime.now());
-            memberTicket.setId(IdUtil.getSnowflake(1,1).nextId());
-            memberTicketMapper.insertSelective(memberTicket);
-        }else{
-            memberTicket.setUpdateTime(DateTime.now());
-            memberTicketMapper.updateByPrimaryKeySelective(memberTicket);
-        }
+        MemberTicket memberTicket = BeanUtil.copyProperties(memberTicketSaveReq, MemberTicket.class);
+        memberTicket.setCreateTime(DateTime.now());
+        memberTicket.setUpdateTime(DateTime.now());
+        memberTicket.setId(IdUtil.getSnowflake(1, 1).nextId());
+        memberTicketMapper.insertSelective(memberTicket);
         return CommonResp.success(null);
     }
 
@@ -48,16 +43,18 @@ public class MemberTicketServiceImpl implements MemberTicketService {
     public CommonResp<PageResp<MemberTicketQueryResp>> queryMemberTicketList(MemberTicketQueryReq memberTicketQueryReq) {
         MemberTicketExample memberTicketExample = new MemberTicketExample();
         MemberTicketExample.Criteria criteria = memberTicketExample.createCriteria();
+        if(ObjectUtil.isNotNull(memberTicketQueryReq.getMemberId())){
+            criteria.andMemberIdEqualTo(memberTicketQueryReq.getMemberId());
+        }
+        LOG.info("查询页码：{}", memberTicketQueryReq.getPage());
+        LOG.info("查询条数：{}", memberTicketQueryReq.getSize());
 
-        LOG.info("查询页码：{}",memberTicketQueryReq.getPage());
-        LOG.info("查询条数：{}",memberTicketQueryReq.getSize());
-
-        PageHelper.startPage(memberTicketQueryReq.getPage(),memberTicketQueryReq.getSize());
+        PageHelper.startPage(memberTicketQueryReq.getPage(), memberTicketQueryReq.getSize());
         List<MemberTicket> memberTickets = memberTicketMapper.selectByExample(memberTicketExample);
         PageInfo<MemberTicket> pageInfo = new PageInfo<>(memberTickets);
 
-        LOG.info("总条数：{}",pageInfo.getTotal());
-        LOG.info("总页数：{}",pageInfo.getPages());
+        LOG.info("总条数：{}", pageInfo.getTotal());
+        LOG.info("总页数：{}", pageInfo.getPages());
 
         List<MemberTicketQueryResp> list = BeanUtil.copyToList(memberTickets, MemberTicketQueryResp.class);
         PageResp<MemberTicketQueryResp> memberTicketQueryRespPageResp = new PageResp<>();

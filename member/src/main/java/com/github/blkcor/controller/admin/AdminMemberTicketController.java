@@ -1,11 +1,10 @@
-package com.github.blkcor.controller;
+package com.github.blkcor.controller.admin;
 
-import com.github.blkcor.context.LoginMemberContext;
 import com.github.blkcor.req.MemberTicketQueryReq;
 import com.github.blkcor.req.MemberTicketSaveReq;
 import com.github.blkcor.resp.CommonResp;
-import com.github.blkcor.resp.MemberTicketQueryResp;
 import com.github.blkcor.resp.PageResp;
+import com.github.blkcor.resp.MemberTicketQueryResp;
 import com.github.blkcor.service.MemberTicketService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -13,16 +12,24 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/memberTicket")
-public class MemberTicketController {
+@RequestMapping("/admin/memberTicket")
+public class AdminMemberTicketController {
     @Resource
     private MemberTicketService memberTicketService;
 
+    @PostMapping("/save")
+    public CommonResp<Void> saveMemberTicket(@RequestBody  @Valid MemberTicketSaveReq memberTicketSaveReq) {
+        return memberTicketService.saveMemberTicket(memberTicketSaveReq);
+    }
 
     @GetMapping("/query-list")
     public CommonResp<PageResp<MemberTicketQueryResp>> queryMemberTicketList(@Valid MemberTicketQueryReq memberTicketQueryReq) {
-        memberTicketQueryReq.setMemberId(LoginMemberContext.getId());
         return memberTicketService.queryMemberTicketList(memberTicketQueryReq);
+    }
+
+    @PutMapping("/update")
+    public CommonResp<Void> updateMemberTicket(@RequestBody @Valid MemberTicketSaveReq memberTicketSaveReq) {
+        return memberTicketService.saveMemberTicket(memberTicketSaveReq);
     }
 
     @DeleteMapping("/delete/{id}")

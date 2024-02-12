@@ -13,6 +13,7 @@ import com.github.blkcor.enums.SeatColEnum;
 import com.github.blkcor.enums.SeatTypeEnum;
 import com.github.blkcor.exception.BusinessException;
 import com.github.blkcor.exception.BusinessExceptionEnum;
+import com.github.blkcor.feign.MemberFeign;
 import com.github.blkcor.mapper.ConfirmOrderMapper;
 import com.github.blkcor.mapper.DailyTrainTicketMapper;
 import com.github.blkcor.req.ConfirmOrderQueryReq;
@@ -35,8 +36,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -98,7 +97,7 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
 
     @Override
     public CommonResp<Void> doConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq) {
-        //（省略）数据校验，车次是否存在，车次余票存在，车次是否在有效期内，ticket条数>0，同乘客同车次同日期不能重复
+        //（省略）数据校验，车次是否存在，车次余票存在，车次是否在有效期内，ticket条数>0，同z同车次同日期不能重复
         //1、保存确认订单表，状态初始化
         ConfirmOrder confirmOrder = new ConfirmOrder();
         confirmOrder.setId(IdUtil.getSnowflake(1, 1).nextId());
@@ -158,9 +157,9 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
         LOG.info("最终选中的座位：{}", JSONUtil.toJsonStr(finalSeatList));
         //5、事务处理
         //5.1、座位表修改售卖情况
-        afterConfirmOrderService.afterDoConfirmOrder(dailyTrainTicket,finalSeatList);
         //5.2、余票表修改库存
         //5.3、为会员增加购票记录
+        afterConfirmOrderService.afterDoConfirmOrder(confirmOrderSaveReq,dailyTrainTicket,finalSeatList);
         //5.4、更新订单表状态为成功
 
         return null;
