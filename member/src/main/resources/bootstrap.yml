@@ -1,3 +1,4 @@
+# bootstrap这个配置文件是权重最大的配置文件，会覆益application.yml中相同的配置
 spring:
   cloud:
     nacos:
@@ -8,4 +9,4 @@ spring:
   application:
     name: member
   profiles:
-    active: dev
+    active: prod
