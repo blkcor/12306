@@ -1,0 +1,9 @@
+# bootstrap这个配置文件是权重最大的配置文件，会覆益application.yml中相同的配置
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://127.0.0.1:8848/
+        namespace: a1dd9e57-0ca7-474b-b7c6-5cb98c2125ac
+  application:
+    name: batch
