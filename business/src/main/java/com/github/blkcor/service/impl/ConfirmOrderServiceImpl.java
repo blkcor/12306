@@ -159,9 +159,8 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
         //5.1、座位表修改售卖情况
         //5.2、余票表修改库存
         //5.3、为会员增加购票记录
-        afterConfirmOrderService.afterDoConfirmOrder(confirmOrderSaveReq,dailyTrainTicket,finalSeatList);
         //5.4、更新订单表状态为成功
-
+        afterConfirmOrderService.afterDoConfirmOrder(confirmOrderSaveReq,dailyTrainTicket,finalSeatList,confirmOrder);
         return null;
     }
 

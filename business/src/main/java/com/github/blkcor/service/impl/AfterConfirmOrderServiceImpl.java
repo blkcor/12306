@@ -3,9 +3,12 @@ package com.github.blkcor.service.impl;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.IdUtil;
 import com.github.blkcor.context.LoginMemberContext;
+import com.github.blkcor.entity.ConfirmOrder;
 import com.github.blkcor.entity.DailyTrainSeat;
 import com.github.blkcor.entity.DailyTrainTicket;
+import com.github.blkcor.enums.ConfirmOrderStatusEnum;
 import com.github.blkcor.feign.MemberFeign;
+import com.github.blkcor.mapper.ConfirmOrderMapper;
 import com.github.blkcor.mapper.DailyTrainSeatMapper;
 import com.github.blkcor.mapper.custom.DailyTrainTicketMapperCustom;
 import com.github.blkcor.req.ConfirmOrderDoReq;
@@ -29,10 +32,12 @@ public class AfterConfirmOrderServiceImpl implements AfterConfirmOrderService {
     private DailyTrainTicketMapperCustom dailyTrainTicketMapperCustom;
     @Resource
     private MemberFeign memberFeign;
+    @Resource
+    private ConfirmOrderMapper confirmOrderMapper;
 
     @Override
     @Transactional
-    public void afterDoConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq, DailyTrainTicket dailyTrainTicket, List<DailyTrainSeat> finalSeatList) {
+    public void afterDoConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq, DailyTrainTicket dailyTrainTicket, List<DailyTrainSeat> finalSeatList, ConfirmOrder confirmOrder) {
         Integer startIndex = dailyTrainTicket.getStartIndex();
         Integer endIndex = dailyTrainTicket.getEndIndex();
         for (int j = 0; j < finalSeatList.size(); j++) {
@@ -83,5 +88,10 @@ public class AfterConfirmOrderServiceImpl implements AfterConfirmOrderService {
 
             memberFeign.save(memberTicketSaveReq);
         }
+        ConfirmOrder confirmOrderForUpdate = new ConfirmOrder();
+        confirmOrderForUpdate.setStatus(ConfirmOrderStatusEnum.SUCCESS.getCode());
+        confirmOrderForUpdate.setUpdateTime(DateTime.now());
+        confirmOrderForUpdate.setId(confirmOrder.getId());
+        confirmOrderMapper.updateByPrimaryKeySelective(confirmOrderForUpdate);
     }
 }
