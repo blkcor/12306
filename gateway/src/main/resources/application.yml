@@ -13,11 +13,11 @@ spring:
         predicates[0]: Path=/member/**
       routes[1]:
         id: business-service
-        uri: http://localhost:8889
+        uri: lb://business
         predicates[0]: Path=/business/**
       routes[2]:
         id: batch-service
-        uri: http://localhost:8890
+        uri: lb://batch
         predicates[0]: Path=/batch/**
 # 路由转发 将/member/** 转发到 member模块
 server:
