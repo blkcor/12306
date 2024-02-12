@@ -2,6 +2,9 @@
 spring:
   cloud:
     nacos:
+      discovery:
+        server-addr: http://127.0.0.1:8848/
+        namespace: a1dd9e57-0ca7-474b-b7c6-5cb98c2125ac
       config:
         #最终会读取的配置文件的名称为：member-dev.yml
         server-addr: http://127.0.0.1:8848/
