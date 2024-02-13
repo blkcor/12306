@@ -37,7 +37,7 @@ public class MemberTicketSaveReq {
      */
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @NotNull(message = "日期不能为空")
-    private Date date;
+    private Date trainDate;
     /**
      * 车次编号
      */
@@ -52,17 +52,17 @@ public class MemberTicketSaveReq {
      * 行号|01、02
      */
     @NotBlank(message = "行号不能为空")
-    private String row;
+    private String seatRow;
     /**
      * 列号|枚举[SeatColEnum]
      */
     @NotBlank(message = "列号不能为空")
-    private String col;
+    private String seatCol;
     /**
      * 出发站
      */
     @NotBlank(message = "出发站不能为空")
-    private String start;
+    private String startStation;
     /**
      * 出发时间
      */
@@ -73,7 +73,7 @@ public class MemberTicketSaveReq {
      * 终点站
      */
     @NotBlank(message = "终点站不能为空")
-    private String end;
+    private String endStation;
     /**
      * 到站时间
      */

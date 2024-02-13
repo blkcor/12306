@@ -85,7 +85,7 @@ public class AfterConfirmOrderServiceImpl implements AfterConfirmOrderService {
             memberTicketSaveReq.setSeatType(seat.getSeatType());
             memberTicketSaveReq.setCreateTime(DateTime.now());
             memberTicketSaveReq.setUpdateTime(DateTime.now());
-
+            //保存会员车票信息
             memberFeign.save(memberTicketSaveReq);
         }
         ConfirmOrder confirmOrderForUpdate = new ConfirmOrder();

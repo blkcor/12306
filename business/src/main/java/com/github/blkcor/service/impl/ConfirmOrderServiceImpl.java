@@ -13,7 +13,6 @@ import com.github.blkcor.enums.SeatColEnum;
 import com.github.blkcor.enums.SeatTypeEnum;
 import com.github.blkcor.exception.BusinessException;
 import com.github.blkcor.exception.BusinessExceptionEnum;
-import com.github.blkcor.feign.MemberFeign;
 import com.github.blkcor.mapper.ConfirmOrderMapper;
 import com.github.blkcor.mapper.DailyTrainTicketMapper;
 import com.github.blkcor.req.ConfirmOrderQueryReq;
