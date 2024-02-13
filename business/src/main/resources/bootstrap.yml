@@ -7,3 +7,12 @@ spring:
         namespace: a1dd9e57-0ca7-474b-b7c6-5cb98c2125ac
   application:
     name: gateway
+seata:
+  #事务组名称
+  tx-service-group: train-group
+  #事务组和seata集群做关联
+  service:
+    vgroup-mapping:
+      train-group: default
+    grouplist:
+      default: 127.0.0.1:8091

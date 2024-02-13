@@ -14,6 +14,8 @@ import com.github.blkcor.mapper.custom.DailyTrainTicketMapperCustom;
 import com.github.blkcor.req.ConfirmOrderDoReq;
 import com.github.blkcor.req.MemberTicketSaveReq;
 import com.github.blkcor.service.AfterConfirmOrderService;
+import io.seata.core.context.RootContext;
+import io.seata.spring.annotation.GlobalTransactional;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,9 @@ public class AfterConfirmOrderServiceImpl implements AfterConfirmOrderService {
     private ConfirmOrderMapper confirmOrderMapper;
 
     @Override
-    @Transactional
+    @GlobalTransactional
     public void afterDoConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq, DailyTrainTicket dailyTrainTicket, List<DailyTrainSeat> finalSeatList, ConfirmOrder confirmOrder) {
+        LOG.info("全局事务id：{}", RootContext.getXID());
         Integer startIndex = dailyTrainTicket.getStartIndex();
         Integer endIndex = dailyTrainTicket.getEndIndex();
         for (int j = 0; j < finalSeatList.size(); j++) {

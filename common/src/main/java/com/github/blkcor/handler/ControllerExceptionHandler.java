@@ -1,8 +1,10 @@
 package com.github.blkcor.handler;
 
 
+import cn.hutool.core.util.StrUtil;
 import com.github.blkcor.exception.BusinessException;
 import com.github.blkcor.resp.CommonResp;
+import io.seata.core.context.RootContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,13 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public CommonResp<Exception> exceptionHandler(Exception e) {
+    public CommonResp<Exception> exceptionHandler(Exception e) throws Exception {
+        String xid = RootContext.getXID();
+        LOG.info("全局事务id：{}",xid);
+        //如果是在全局事务中出现了异常，不要包装返回值，直接将异常抛出，让seata进行rollback
+        if(StrUtil.isNotBlank(xid)){
+            throw e;
+        }
         CommonResp<Exception> commonResp = new CommonResp<>();
         LOG.error("系统异常: {}", e.getMessage());
         commonResp.setSuccess(false);

@@ -14,3 +14,13 @@ spring:
     name: member
   profiles:
     active: prod
+
+seata:
+  #事务组名称
+  tx-service-group: train-group
+  #事务组和seata集群做关联
+  service:
+    vgroup-mapping:
+      train-group: default
+    grouplist:
+      default: 127.0.0.1:8091
