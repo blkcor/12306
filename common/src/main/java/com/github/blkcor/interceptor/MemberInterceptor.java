@@ -20,6 +20,7 @@ public class MemberInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        LOG.info("进入memberInterceptor拦截器");
         /*
          * 1、从header中获取token
          * 2、从token中获取参数并且设置到线程本地变量中
@@ -34,6 +35,7 @@ public class MemberInterceptor implements HandlerInterceptor {
             memberLoginResp.setToken(token);
             LoginMemberContext.setMember(memberLoginResp);
         }
+        LOG.info("退出memberInterceptor拦截器");
         return true;
     }
 }
