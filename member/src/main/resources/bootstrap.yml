@@ -15,12 +15,34 @@ spring:
   profiles:
     active: prod
 
+
+# seata注册中心
 seata:
+  registry:
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: 127.0.0.1:8848
+      group: SEATA_GROUP
+      namespace: a1dd9e57-0ca7-474b-b7c6-5cb98c2125ac
+#seata配置中心
+  config:
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+      group: SEATA_GROUP
+      namespace: a1dd9e57-0ca7-474b-b7c6-5cb98c2125ac
+      data-id: seataServer.properties
+
   #事务组名称
   tx-service-group: train-group
   #事务组和seata集群做关联
-  service:
-    vgroup-mapping:
-      train-group: default
-    grouplist:
-      default: 127.0.0.1:8091
+#  service:
+#    vgroup-mapping:
+#      train-group: default
+#    grouplist:
+#      default: 127.0.0.1:8091
+
+###以下内容在seata-server.properties中配置##
+##server.vgroupMapping.train-group=default
+##server.default.groupList=127.0.0.1:8091
