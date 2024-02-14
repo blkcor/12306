@@ -17,6 +17,7 @@ public class SpringMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(memberInterceptor)
                 //针对所有的请求接口生效
                 .addPathPatterns("/**")
+                .excludePathPatterns("/test/**")
                 .excludePathPatterns("/admin/**");
     }
 }

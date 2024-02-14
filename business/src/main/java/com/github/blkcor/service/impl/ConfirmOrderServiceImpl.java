@@ -5,6 +5,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.*;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.fastjson.JSON;
 import com.github.blkcor.context.LoginMemberContext;
 import com.github.blkcor.entity.*;
@@ -103,6 +105,7 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
     }
 
     @Override
+    @SentinelResource(value = "doConfirmOrder", blockHandler = "doConfirmOrderBlockHandler")
     public CommonResp<Void> doConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq) {
         //（省略）数据校验，车次是否存在，车次余票存在，车次是否在有效期内，ticket条数>0，同z同车次同日期不能重复
         String lockKey = confirmOrderSaveReq.getTrainCode() + "-" + confirmOrderSaveReq.getDate();
@@ -209,10 +212,21 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
             throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_EXCEPTION);
         } finally {
             LOG.info("购票结束，释放锁");
-            if(ObjectUtil.isNotNull(lock) && lock.isHeldByCurrentThread()){
+            if (ObjectUtil.isNotNull(lock) && lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
         }
+    }
+
+    /**
+     * 限流或降级处理  需包含限流的方法中的所有参数和BlockException参数
+     *
+     * @param req 限流的方法中的所有参数
+     * @param e   BlockException参数
+     */
+    public void doConfirmOrderBlockHandler(ConfirmOrderDoReq req, BlockException e) {
+        LOG.error("购票接口限流或降级:{}", req);
+        throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_FLOW_EXCEPTION);
     }
 
     public void getSeat(List<DailyTrainSeat> finalSeatList, DailyTrainTicket dailyTrainTicket, String trainCode, Date date, String seatType, String colType, List<Integer> offsetList) {

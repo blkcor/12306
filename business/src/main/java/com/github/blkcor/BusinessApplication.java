@@ -1,6 +1,9 @@
 package com.github.blkcor;
 
 
+import com.alibaba.csp.sentinel.slots.block.RuleConstant;
+import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
+import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,13 +14,27 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.ConfigurableEnvironment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @SpringBootApplication(scanBasePackages = "com.github.blkcor")
 @MapperScan("com.github.blkcor.mapper")
 @EnableFeignClients
 @EnableCaching
 public class BusinessApplication {
     private static final Logger LOG = LoggerFactory.getLogger(BusinessApplication.class);
+    private static void initFlowRules(){
+        List<FlowRule> rules = new ArrayList<>();
+        FlowRule rule = new FlowRule();
+        rule.setResource("doConfirmOrder");
+        rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
+        // Set limit QPS to 20.
+        rule.setCount(20);
+        rules.add(rule);
+        FlowRuleManager.loadRules(rules);
+    }
     public static void main(String[] args) {
+        initFlowRules();
         SpringApplication app = new SpringApplication(BusinessApplication.class);
         ConfigurableEnvironment environment = app.run(args).getEnvironment();
         LOG.info("启动成功!");
