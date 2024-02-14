@@ -28,6 +28,8 @@ import com.github.blkcor.service.DailyTrainSeatService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -54,6 +56,8 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
     private AfterConfirmOrderService afterConfirmOrderService;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private RedissonClient redissonClient;
 
     @Override
     public CommonResp<Void> saveConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq) {
@@ -102,14 +106,34 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
     public CommonResp<Void> doConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq) {
         //（省略）数据校验，车次是否存在，车次余票存在，车次是否在有效期内，ticket条数>0，同z同车次同日期不能重复
         String lockKey = confirmOrderSaveReq.getTrainCode() + "-" + confirmOrderSaveReq.getDate();
-        Boolean locked = stringRedisTemplate.opsForValue().setIfAbsent(lockKey, lockKey, 5, TimeUnit.SECONDS);
-        if (Boolean.TRUE.equals(locked)) {
-            LOG.info("获取锁成功，可以执行购票");
-        } else {
-            LOG.error("获取锁失败，购票失败");
-            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
-        }
+//        Boolean locked = stringRedisTemplate.opsForValue().setIfAbsent(lockKey, lockKey, 5, TimeUnit.SECONDS);
+//        if (Boolean.TRUE.equals(locked)) {
+//            LOG.info("获取锁成功，可以执行购票");
+//        } else {
+//            LOG.error("获取锁失败，购票失败");
+//            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
+//        }
+        RLock lock = null;
         try {
+            lock = redissonClient.getLock(lockKey);
+            /*
+             * 1、尝试获取锁，如果获取不到，立即返回false
+             * 2、如果获取到锁，立即返回true
+             *
+             * 参数说明:
+             * - waitTime: 最多等待时间
+             * - leaseTime: 上锁后自动释放锁的时间
+             * - unit: 时间单位
+             * 当waitTime=0时，立即返回结果，此时看门狗生效
+             * lock.tryLock(10,30,TimeUnit.SECONDS) 这种写法看门狗不会生效
+             */
+            boolean locked = lock.tryLock(0, TimeUnit.SECONDS);
+            if (Boolean.TRUE.equals(locked)) {
+                LOG.info("获取锁成功，可以执行购票");
+            } else {
+                LOG.error("获取锁失败，购票失败");
+                throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
+            }
             //1、保存确认订单表，状态初始化
             ConfirmOrder confirmOrder = new ConfirmOrder();
             confirmOrder.setId(IdUtil.getSnowflake(1, 1).nextId());
@@ -172,14 +196,22 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
             //5.2、余票表修改库存
             //5.3、为会员增加购票记录
             //5.4、更新订单表状态为成功
-            afterConfirmOrderService.afterDoConfirmOrder(confirmOrderSaveReq, dailyTrainTicket, finalSeatList, confirmOrder);
+            try {
+                afterConfirmOrderService.afterDoConfirmOrder(confirmOrderSaveReq, dailyTrainTicket, finalSeatList, confirmOrder);
+            } catch (Exception e) {
+                LOG.error("保存购票信息异常");
+                throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_EXCEPTION);
+            }
+
             return CommonResp.success(null);
         } catch (Exception e) {
-            LOG.error("保存购票信息异常");
+            LOG.error("购票异常，{}", e.getMessage());
             throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_EXCEPTION);
         } finally {
             LOG.info("购票结束，释放锁");
-            stringRedisTemplate.delete(lockKey);
+            if(ObjectUtil.isNotNull(lock) && lock.isHeldByCurrentThread()){
+                lock.unlock();
+            }
         }
     }
 
