@@ -1,6 +1,9 @@
 package com.github.blkcor.controller;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.github.blkcor.exception.BusinessException;
+import com.github.blkcor.exception.BusinessExceptionEnum;
 import jakarta.annotation.Resource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,19 +17,15 @@ public class HelloController {
 
     @Resource
     private RedisTemplate<String,String> redisTemplate;
-    @Resource
-    private Environment environment;
     @GetMapping("/hello")
-    @SentinelResource(value= "hello",fallback = "helloFallback")
+    @SentinelResource(value= "BLKCOR",blockHandler = "helloFallback")
     public String hello() {
-        String transport = environment.getProperty("spring.cloud.sentinel.transport.dashboard");
-        String port = environment.getProperty("spring.cloud.sentinel.transport.port");
         redisTemplate.opsForValue().set("hello","blkcor");
-        return port + " " + transport;
+        return "hello blkcor!";
     }
 
-    private String helloFallback(){
-        return "请求被限流";
+    private String helloFallback(BlockException e){
+        throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_FLOW_EXCEPTION);
     }
 
     @GetMapping("/hello/get")
