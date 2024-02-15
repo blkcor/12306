@@ -7,12 +7,12 @@ spring:
         namespace: a1dd9e57-0ca7-474b-b7c6-5cb98c2125ac
     sentinel:
       datasource:
-        nacos:
+        flow:
           nacos:
             serverAddr: localhost:8848
             namespace: a1dd9e57-0ca7-474b-b7c6-5cb98c2125ac
-            groupId: TRAIN_GROUP
-            dataId: sentinel
+            groupId: DEFAULT_GROUP
+            dataId: sentinel-business-flow
             rule-type: flow
   application:
     name: business
