@@ -23,18 +23,18 @@ import java.util.List;
 @EnableCaching
 public class BusinessApplication {
     private static final Logger LOG = LoggerFactory.getLogger(BusinessApplication.class);
-    private static void initFlowRules(){
-        List<FlowRule> rules = new ArrayList<>();
-        FlowRule rule = new FlowRule();
-        rule.setResource("doConfirmOrder");
-        rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
-        // Set limit QPS to 20.
-        rule.setCount(20);
-        rules.add(rule);
-        FlowRuleManager.loadRules(rules);
-    }
+//    private static void initFlowRules(){
+//        List<FlowRule> rules = new ArrayList<>();
+//        FlowRule rule = new FlowRule();
+//        rule.setResource("hello");
+//        rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
+//        // Set limit QPS to 20.
+//        rule.setCount(20);
+//        rules.add(rule);
+//        FlowRuleManager.loadRules(rules);
+//    }
     public static void main(String[] args) {
-        initFlowRules();
+//        initFlowRules();
         SpringApplication app = new SpringApplication(BusinessApplication.class);
         ConfigurableEnvironment environment = app.run(args).getEnvironment();
         LOG.info("启动成功!");
