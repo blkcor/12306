@@ -19,7 +19,8 @@ public class HelloController {
     private RedisTemplate<String,String> redisTemplate;
     @GetMapping("/hello")
     @SentinelResource(value= "BLKCOR",blockHandler = "helloFallback")
-    public String hello() {
+    public String hello() throws InterruptedException {
+        Thread.sleep(500);
         redisTemplate.opsForValue().set("hello","blkcor");
         return "hello blkcor!";
     }

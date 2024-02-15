@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.Date;
 
 @Component
-@FeignClient("business")
+@FeignClient(value = "business",fallback = BusinessFeignFallback.class)
 public interface BusinessFeign {
-    @GetMapping("/test/hello")
+    @GetMapping("/business/test/hello")
     String hello();
 
-    @GetMapping("/admin/dailyTrain/gen-daily/{date}")
+    @GetMapping("/business/admin/dailyTrain/gen-daily/{date}")
     CommonResp<Void> genDaily(
             @PathVariable
             @DateTimeFormat(pattern = "yyyy-MM-dd") Date date);
