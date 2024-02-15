@@ -5,6 +5,15 @@ spring:
       discovery:
         server-addr: http://127.0.0.1:8848/
         namespace: a1dd9e57-0ca7-474b-b7c6-5cb98c2125ac
+    sentinel:
+      datasource:
+        nacos:
+          nacos:
+            serverAddr: localhost:8848
+            namespace: a1dd9e57-0ca7-474b-b7c6-5cb98c2125ac
+            groupId: TRAIN_GROUP
+            dataId: sentinel
+            rule-type: flow
   application:
     name: business
 seata:
