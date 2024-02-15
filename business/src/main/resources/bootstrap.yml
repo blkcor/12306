@@ -14,7 +14,6 @@ spring:
             groupId: DEFAULT_GROUP
             dataId: sentinel-business-flow
             rule-type: flow
-      web-context-unify: false
   application:
     name: business
 seata:
