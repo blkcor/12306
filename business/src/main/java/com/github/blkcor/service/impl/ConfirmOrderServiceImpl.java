@@ -11,6 +11,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.blkcor.context.LoginMemberContext;
 import com.github.blkcor.entity.*;
 import com.github.blkcor.enums.ConfirmOrderStatusEnum;
+import com.github.blkcor.enums.RedisKeyPrefixEnum;
 import com.github.blkcor.enums.SeatColEnum;
 import com.github.blkcor.enums.SeatTypeEnum;
 import com.github.blkcor.exception.BusinessException;
@@ -111,7 +112,7 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
         if (!validated) {
             throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_TOKEN_FALL);
         }
-        String lockKey = confirmOrderSaveReq.getTrainCode() + "-" + confirmOrderSaveReq.getDate();
+        String lockKey = RedisKeyPrefixEnum.CONFIRM_ORDER + "-" + confirmOrderSaveReq.getTrainCode() + "-" + confirmOrderSaveReq.getDate();
 //        Boolean locked = stringRedisTemplate.opsForValue().setIfAbsent(lockKey, lockKey, 5, TimeUnit.SECONDS);
 //        if (Boolean.TRUE.equals(locked)) {
 //            LOG.info("获取锁成功，可以执行购票");

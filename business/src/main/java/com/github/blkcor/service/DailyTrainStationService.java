@@ -49,7 +49,8 @@ public interface DailyTrainStationService {
      * 根据车次编号查询车站数量
      *
      * @param trainCode 车次编号
+     * @param date 日期
      * @return 返回结果
      */
-    Long countByTrainCode(String trainCode);
+    Long countByTrainCode(Date date, String trainCode);
 }

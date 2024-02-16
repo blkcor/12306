@@ -7,6 +7,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.blkcor.entity.SkToken;
 import com.github.blkcor.entity.SkTokenExample;
+import com.github.blkcor.enums.RedisKeyPrefixEnum;
 import com.github.blkcor.mapper.SkTokenMapper;
 import com.github.blkcor.mapper.custom.SkTokenMapperCustom;
 import com.github.blkcor.req.SkTokenQueryReq;
@@ -102,15 +103,15 @@ public class SkTokenServiceImpl implements SkTokenService {
         skToken.setCreateTime(DateTime.now());
         skToken.setUpdateTime(DateTime.now());
 
-        //计算令牌数量=最多卖出的票的数量* 0.75
+        //计算令牌数量=最多卖出的票的数量
         //计算车次的座位总数
         Long seatCount = dailyTrainSeatService.countSeat(date, trainCode);
         LOG.info("车次{}的座位总数：{}", trainCode, seatCount);
         //计算车厢的总数
-        Long stationCount = dailyTrainStationService.countByTrainCode(trainCode);
+        Long stationCount = dailyTrainStationService.countByTrainCode(date,trainCode);
         LOG.info("车次{}的车厢总数：{}", trainCode, stationCount);
         //计算令牌总数
-        Long tokenCount = seatCount * stationCount * 3 / 4;
+        Long tokenCount = seatCount * stationCount;
         skToken.setCount(tokenCount.intValue());
         LOG.info("车次{}的令牌总数：{}", trainCode, tokenCount);
         skTokenMapper.insert(skToken);
@@ -121,13 +122,13 @@ public class SkTokenServiceImpl implements SkTokenService {
     @Override
     public Boolean validateToken(Date date, String trainCode, Long memberId) {
         LOG.info("会员{},获取日期{}，车次{}的令牌开始", memberId, date, trainCode);
-        String key = DateUtil.formatDate(date) + "-" + trainCode + "-" + memberId;
+        String lockedKey = RedisKeyPrefixEnum.SK_TOKEN + "-" + DateUtil.formatDate(date) + "-" + trainCode + "-" + memberId;
         //这里设置上锁时间，防止同一个用户对同日期桶车次进行频繁抢票
-        Boolean locked = redisTemplate.opsForValue().setIfAbsent(key, key, 5, TimeUnit.SECONDS);
+        Boolean locked = redisTemplate.opsForValue().setIfAbsent(lockedKey, lockedKey, 5, TimeUnit.SECONDS);
         if (Boolean.TRUE.equals(locked)) {
-            LOG.info("获取锁成功:{}", key);
+            LOG.info("获取锁成功:{}", lockedKey);
         } else {
-            LOG.info("获取锁失败:{}", key);
+            LOG.info("获取锁失败:{}", lockedKey);
             return false;
         }
         int updatedCount = skTokenMapperCustom.decrease(date, trainCode);

@@ -103,10 +103,10 @@ public class DailyTrainStationServiceImpl implements DailyTrainStationService {
     }
 
     @Override
-    public Long countByTrainCode(String trainCode) {
-        TrainStationExample trainStationExample = new TrainStationExample();
-        trainStationExample.createCriteria().andTrainCodeEqualTo(trainCode);
-        return trainStationMapper.countByExample(trainStationExample);
+    public Long countByTrainCode(Date date,String trainCode) {
+        DailyTrainStationExample dailyTrainStationExample = new DailyTrainStationExample();
+        dailyTrainStationExample.createCriteria().andTrainCodeEqualTo(trainCode).andDateEqualTo(date);
+        return dailyTrainStationMapper.countByExample(dailyTrainStationExample);
     }
 
     private void genDailyTrainStation(Date date, TrainStation trainStation) {
