@@ -42,6 +42,8 @@ public class DailyTrainServiceImpl implements DailyTrainService {
     private DailyTrainSeatService dailyTrainSeatService;
     @Resource
     private DailyTrainTicketService dailyTrainTicketService;
+    @Resource
+    private SkTokenService skTokenService;
 
     @Override
     public CommonResp<Void> saveDailyTrain(DailyTrainSaveReq dailyTrainSaveReq) {
@@ -138,5 +140,7 @@ public class DailyTrainServiceImpl implements DailyTrainService {
         dailyTrainSeatService.genDailyTrainSeat(date, train.getCode());
         //生成每日余票数据
         dailyTrainTicketService.genDailyTrainTicket(date, train.getCode());
+        //生成每日车次令牌
+        skTokenService.genDailySkToken(date, train.getCode());
     }
 }

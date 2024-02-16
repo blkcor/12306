@@ -111,7 +111,11 @@ public class DailyTrainSeatServiceImpl implements DailyTrainSeatService {
     @Override
     public Long countSeat(Date date, String trainCode, String seatType) {
         DailyTrainSeatExample dailyTrainSeatExample = new DailyTrainSeatExample();
-        dailyTrainSeatExample.createCriteria().andDateEqualTo(date).andTrainCodeEqualTo(trainCode).andSeatTypeEqualTo(seatType);
+        DailyTrainSeatExample.Criteria criteria = dailyTrainSeatExample.createCriteria();
+        criteria.andDateEqualTo(date).andTrainCodeEqualTo(trainCode);
+        if (ObjectUtil.isNotNull(seatType)) {
+            criteria.andSeatTypeEqualTo(seatType);
+        }
         long remain = dailyTrainSeatMapper.countByExample(dailyTrainSeatExample);
         //如果座位为0，则返回-1，表示不售卖，前端比较好展示
         if (remain == 0L) {
@@ -120,6 +124,11 @@ public class DailyTrainSeatServiceImpl implements DailyTrainSeatService {
             return -1L;
         }
         return remain;
+    }
+
+    @Override
+    public Long countSeat(Date date, String trainCode) {
+        return countSeat(date, trainCode, null);
     }
 
     @Override

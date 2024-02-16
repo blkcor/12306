@@ -6,11 +6,14 @@ import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.SkTokenQueryResp;
 
+import java.util.Date;
+
 
 public interface SkTokenService {
 
     /**
      * 保存秒杀令牌信息
+     *
      * @param skTokenSaveReq 请求参数
      * @return 返回结果
      */
@@ -18,6 +21,7 @@ public interface SkTokenService {
 
     /**
      * 查询秒杀令牌列表
+     *
      * @param skTokenQueryReq 请求参数
      * @return 返回结果
      */
@@ -26,8 +30,17 @@ public interface SkTokenService {
 
     /**
      * 删除秒杀令牌信息
+     *
      * @param id 秒杀令牌id
      * @return 返回结果
      */
     CommonResp<Void> deleteSkToken(Long id);
+
+    /**
+     * 生成令牌信息
+     *
+     * @param date 日期
+     * @return 返回结果
+     */
+    CommonResp<Void> genDailySkToken(Date date,String trainCode);
 }

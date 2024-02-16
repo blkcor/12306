@@ -52,5 +52,13 @@ public interface DailyTrainSeatService {
      */
     Long countSeat(Date date,String trainCode,String seatType);
 
+    /**
+     * 查询每日车次座位信息
+     * @param date 日期
+     * @param trainCode 车次编号
+     * @return 返回结果
+     */
+    Long countSeat(Date date,String trainCode);
+
     List<DailyTrainSeat> selectByCarriageIndex(String trainCode, Date date, Integer carriageIndex);
 }

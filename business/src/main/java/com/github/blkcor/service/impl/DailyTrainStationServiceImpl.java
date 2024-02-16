@@ -102,6 +102,13 @@ public class DailyTrainStationServiceImpl implements DailyTrainStationService {
         return CommonResp.success(null);
     }
 
+    @Override
+    public Long countByTrainCode(String trainCode) {
+        TrainStationExample trainStationExample = new TrainStationExample();
+        trainStationExample.createCriteria().andTrainCodeEqualTo(trainCode);
+        return trainStationMapper.countByExample(trainStationExample);
+    }
+
     private void genDailyTrainStation(Date date, TrainStation trainStation) {
         DailyTrainStation dailyTrainStation = BeanUtil.copyProperties(trainStation, DailyTrainStation.class);
         dailyTrainStation.setId(IdUtil.getSnowflake(1, 1).nextId());
