@@ -23,10 +23,7 @@ import com.github.blkcor.req.ConfirmOrderTicketReq;
 import com.github.blkcor.resp.CommonResp;
 import com.github.blkcor.resp.PageResp;
 import com.github.blkcor.resp.ConfirmOrderQueryResp;
-import com.github.blkcor.service.AfterConfirmOrderService;
-import com.github.blkcor.service.ConfirmOrderService;
-import com.github.blkcor.service.DailyTrainCarriageService;
-import com.github.blkcor.service.DailyTrainSeatService;
+import com.github.blkcor.service.*;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
@@ -60,6 +57,8 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private RedissonClient redissonClient;
+    @Resource
+    private SkTokenService skTokenService;
 
     @Override
     public CommonResp<Void> saveConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq) {
@@ -108,6 +107,10 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
     @SentinelResource(value = "doConfirmOrder", blockHandler = "doConfirmOrderBlockHandler")
     public CommonResp<Void> doConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq) {
         //（省略）数据校验，车次是否存在，车次余票存在，车次是否在有效期内，ticket条数>0，同z同车次同日期不能重复
+        Boolean validated = skTokenService.validateToken(confirmOrderSaveReq.getDate(), confirmOrderSaveReq.getTrainCode(), LoginMemberContext.getId());
+        if (!validated) {
+            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_TOKEN_FALL);
+        }
         String lockKey = confirmOrderSaveReq.getTrainCode() + "-" + confirmOrderSaveReq.getDate();
 //        Boolean locked = stringRedisTemplate.opsForValue().setIfAbsent(lockKey, lockKey, 5, TimeUnit.SECONDS);
 //        if (Boolean.TRUE.equals(locked)) {

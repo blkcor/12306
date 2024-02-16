@@ -43,4 +43,13 @@ public interface SkTokenService {
      * @return 返回结果
      */
     CommonResp<Void> genDailySkToken(Date date,String trainCode);
+
+    /**
+     * 校验令牌
+     * @param date 日期
+     * @param trainCode 车次编号
+     * @param memberId 会员id
+     * @return 返回结果
+     */
+    Boolean validateToken(Date date,String trainCode,Long memberId);
 }

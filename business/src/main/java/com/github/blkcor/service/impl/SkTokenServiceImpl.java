@@ -7,6 +7,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.github.blkcor.entity.SkToken;
 import com.github.blkcor.entity.SkTokenExample;
 import com.github.blkcor.mapper.SkTokenMapper;
+import com.github.blkcor.mapper.custom.SkTokenMapperCustom;
 import com.github.blkcor.req.SkTokenQueryReq;
 import com.github.blkcor.req.SkTokenSaveReq;
 import com.github.blkcor.resp.CommonResp;
@@ -35,6 +36,8 @@ public class SkTokenServiceImpl implements SkTokenService {
     private DailyTrainSeatService dailyTrainSeatService;
     @Resource
     private DailyTrainStationService dailyTrainStationService;
+    @Resource
+    private SkTokenMapperCustom skTokenMapperCustom;
 
     @Override
     public CommonResp<Void> saveSkToken(SkTokenSaveReq skTokenSaveReq) {
@@ -108,5 +111,12 @@ public class SkTokenServiceImpl implements SkTokenService {
         skTokenMapper.insert(skToken);
 
         return CommonResp.success(null);
+    }
+
+    @Override
+    public Boolean validateToken(Date date, String trainCode, Long memberId) {
+        LOG.info("会员{},获取日期{}，车次{}的令牌开始", memberId, date, trainCode);
+        int updatedCount = skTokenMapperCustom.decrease(date, trainCode);
+        return updatedCount > 0;
     }
 }
