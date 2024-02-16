@@ -2,6 +2,7 @@ package com.github.blkcor.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.blkcor.entity.SkToken;
@@ -21,10 +22,12 @@ import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -38,6 +41,8 @@ public class SkTokenServiceImpl implements SkTokenService {
     private DailyTrainStationService dailyTrainStationService;
     @Resource
     private SkTokenMapperCustom skTokenMapperCustom;
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
 
     @Override
     public CommonResp<Void> saveSkToken(SkTokenSaveReq skTokenSaveReq) {
@@ -116,6 +121,15 @@ public class SkTokenServiceImpl implements SkTokenService {
     @Override
     public Boolean validateToken(Date date, String trainCode, Long memberId) {
         LOG.info("会员{},获取日期{}，车次{}的令牌开始", memberId, date, trainCode);
+        String key = DateUtil.formatDate(date) + "-" + trainCode + "-" + memberId;
+        //这里设置上锁时间，防止同一个用户对同日期桶车次进行频繁抢票
+        Boolean locked = redisTemplate.opsForValue().setIfAbsent(key, key, 5, TimeUnit.SECONDS);
+        if (Boolean.TRUE.equals(locked)) {
+            LOG.info("获取锁成功:{}", key);
+        } else {
+            LOG.info("获取锁失败:{}", key);
+            return false;
+        }
         int updatedCount = skTokenMapperCustom.decrease(date, trainCode);
         return updatedCount > 0;
     }
