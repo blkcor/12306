@@ -124,7 +124,7 @@ public class SkTokenServiceImpl implements SkTokenService {
     public Boolean validateToken(Date date, String trainCode, Long memberId) {
         LOG.info("会员{},获取日期{}，车次{}的令牌开始", memberId, date, trainCode);
         String lockedKey = RedisKeyPrefixEnum.SK_TOKEN + "-" + DateUtil.formatDate(date) + "-" + trainCode + "-" + memberId;
-        //这里设置上锁时间，防止同一个用户对同日期桶车次进行频繁抢票
+        //这里设置上锁时间，防止同一个用户对同日期同车次进行频繁抢票
         Boolean locked = redisTemplate.opsForValue().setIfAbsent(lockedKey, lockedKey, 5, TimeUnit.SECONDS);
         if (Boolean.TRUE.equals(locked)) {
             LOG.info("获取锁成功:{}", lockedKey);
