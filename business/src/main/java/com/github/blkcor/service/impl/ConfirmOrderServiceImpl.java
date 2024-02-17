@@ -108,6 +108,19 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
     @SentinelResource(value = "doConfirmOrder", blockHandler = "doConfirmOrderBlockHandler")
     public CommonResp<Void> doConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq) {
         //（省略）数据校验，车次是否存在，车次余票存在，车次是否在有效期内，ticket条数>0，同z同车次同日期不能重复
+        String verifyCode = stringRedisTemplate.opsForValue().get(confirmOrderSaveReq.getVerifyCodeToken());
+        LOG.info("从redis中获取验证码:{}", verifyCode);
+        if (ObjectUtil.isNull(verifyCode)) {
+            LOG.info("验证码已经过期");
+            return CommonResp.fail("验证码已经过期");
+        }
+        if (!verifyCode.equalsIgnoreCase(confirmOrderSaveReq.getVerifyCode())) {
+            LOG.info("验证码不正确");
+            return CommonResp.fail("验证码不正确");
+        } else {
+            //从redis中删除验证码
+            stringRedisTemplate.delete(confirmOrderSaveReq.getVerifyCodeToken());
+        }
         Boolean validated = skTokenService.validateToken(confirmOrderSaveReq.getDate(), confirmOrderSaveReq.getTrainCode(), LoginMemberContext.getId());
         if (!validated) {
             throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_TOKEN_FALL);

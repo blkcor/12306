@@ -47,4 +47,14 @@ public class ConfirmOrderDoReq {
      */
     @NotEmpty(message = "购票信息不能为空")
     private List<ConfirmOrderTicketReq> tickets;
+    /**
+     * 验证码
+     */
+    @NotBlank(message = "图形验证码不能为空")
+    private String verifyCode;
+    /**
+     * 验证码token
+     */
+    @NotBlank(message = "图形验证码token不能为空")
+    private String verifyCodeToken;
 }
