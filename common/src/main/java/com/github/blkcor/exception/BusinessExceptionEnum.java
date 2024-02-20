@@ -29,7 +29,11 @@ public enum BusinessExceptionEnum {
 
     CONFIRM_ORDER_FLOW_EXCEPTION("当前抢票人数过多，请稍后重试"),
 
-    CONFIRM_ORDER_SK_TOKEN_FALL("当前抢票人数过多，请5s后重试");
+    CONFIRM_ORDER_SK_TOKEN_FALL("当前抢票人数过多，请5s后重试"),
+
+    CONFIRM_ORDER_VERIFY_CODE_EXPIRE("验证码已过期"),
+
+    CONFIRM_ORDER_VERIFY_CODE_ERROR("验证码错误");
 
 
     private String desc;

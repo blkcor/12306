@@ -2,7 +2,6 @@ package com.github.blkcor.service.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.IdUtil;
-import com.github.blkcor.context.LoginMemberContext;
 import com.github.blkcor.entity.ConfirmOrder;
 import com.github.blkcor.entity.DailyTrainSeat;
 import com.github.blkcor.entity.DailyTrainTicket;
@@ -20,7 +19,6 @@ import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -73,7 +71,7 @@ public class AfterConfirmOrderServiceImpl implements AfterConfirmOrderService {
             dailyTrainTicketMapperCustom.updateCountBySell(seat.getSeatType(), seat.getTrainCode(), seat.getDate(), minStartIndex, maxStartIndex, minEndIndex, maxEndIndex);
             MemberTicketSaveReq memberTicketSaveReq = new MemberTicketSaveReq();
             memberTicketSaveReq.setId(IdUtil.getSnowflake(1, 1).nextId());
-            memberTicketSaveReq.setMemberId(LoginMemberContext.getId());
+            memberTicketSaveReq.setMemberId(confirmOrderSaveReq.getMemberId());
             memberTicketSaveReq.setPassengerId(confirmOrderSaveReq.getTickets().get(j).getPassengerId());
             memberTicketSaveReq.setPassengerName(confirmOrderSaveReq.getTickets().get(j).getPassengerName());
             memberTicketSaveReq.setTrainDate(seat.getDate());

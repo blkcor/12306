@@ -57,4 +57,10 @@ public class ConfirmOrderDoReq {
      */
     @NotBlank(message = "图形验证码token不能为空")
     private String verifyCodeToken;
+
+    /**
+     * 会员id
+     */
+    @NotNull(message = "会员id不能为空")
+    private Long memberId;
 }

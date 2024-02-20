@@ -1,5 +1,7 @@
 package com.github.blkcor.service;
 
+import com.github.blkcor.dto.ConfirmOrderDto;
+import com.github.blkcor.entity.ConfirmOrder;
 import com.github.blkcor.req.ConfirmOrderQueryReq;
 import com.github.blkcor.req.ConfirmOrderDoReq;
 import com.github.blkcor.resp.CommonResp;
@@ -33,8 +35,14 @@ public interface ConfirmOrderService {
 
     /**
      * 执行确认订单
-     * @param confirmOrderSaveReq 请求参数
+     * @param confirmOrderDto 请求参数
      * @return 返回结果
      */
-    CommonResp<Void> doConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq);
+    CommonResp<Void> doConfirmOrder(ConfirmOrderDto confirmOrderDto);
+
+    /**
+     * 更新订单状态
+     * @param confirmOrder
+     */
+    void updateStatus(ConfirmOrder confirmOrder);
 }
