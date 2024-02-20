@@ -22,6 +22,7 @@ import jakarta.annotation.Resource;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -38,35 +39,37 @@ public class BeforeConfirmOrderServiceImpl implements BeforeConfirmOrderService 
     @Resource
     private RocketMQTemplate rocketMQTemplate;
 
-
+    @Value("${spring.profiles.active}")
+    private String env;
     @SentinelResource(value = "beforeDoConfirmOrder", blockHandler = "beforeDoConfirmOrderBlockHandler")
     @Override
     public void beforeDoConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq) {
         confirmOrderSaveReq.setMemberId(LoginMemberContext.getId());
-        /*
-         * 校验验证码
-         */
-        String verifyCode = stringRedisTemplate.opsForValue().get(confirmOrderSaveReq.getVerifyCodeToken());
-        LOG.info("从redis中获取验证码:{}", verifyCode);
-        if (ObjectUtil.isNull(verifyCode)) {
-            LOG.info("验证码已经过期");
-            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_VERIFY_CODE_EXPIRE);
+        if(!env.equals("dev")){
+            /*
+             * 校验验证码
+             */
+            String verifyCode = stringRedisTemplate.opsForValue().get(confirmOrderSaveReq.getVerifyCodeToken());
+            LOG.info("从redis中获取验证码:{}", verifyCode);
+            if (ObjectUtil.isNull(verifyCode)) {
+                LOG.info("验证码已经过期");
+                throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_VERIFY_CODE_EXPIRE);
+            }
+            if (!verifyCode.equalsIgnoreCase(confirmOrderSaveReq.getVerifyCode())) {
+                LOG.info("验证码不正确");
+                throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_VERIFY_CODE_ERROR);
+            } else {
+                //从redis中删除验证码
+                stringRedisTemplate.delete(confirmOrderSaveReq.getVerifyCodeToken());
+            }
+            /*
+             * 获取令牌
+             */
+            Boolean validated = skTokenService.validateToken(confirmOrderSaveReq.getDate(), confirmOrderSaveReq.getTrainCode(), LoginMemberContext.getId());
+            if (!validated) {
+                throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_TOKEN_FALL);
+            }
         }
-        if (!verifyCode.equalsIgnoreCase(confirmOrderSaveReq.getVerifyCode())) {
-            LOG.info("验证码不正确");
-            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_VERIFY_CODE_ERROR);
-        } else {
-            //从redis中删除验证码
-            stringRedisTemplate.delete(confirmOrderSaveReq.getVerifyCodeToken());
-        }
-        /*
-         * 获取令牌
-         */
-        Boolean validated = skTokenService.validateToken(confirmOrderSaveReq.getDate(), confirmOrderSaveReq.getTrainCode(), LoginMemberContext.getId());
-        if (!validated) {
-            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_TOKEN_FALL);
-        }
-
         //1、保存确认订单表，状态初始化
         ConfirmOrder confirmOrder = new ConfirmOrder();
         confirmOrder.setId(IdUtil.getSnowflake(1, 1).nextId());
