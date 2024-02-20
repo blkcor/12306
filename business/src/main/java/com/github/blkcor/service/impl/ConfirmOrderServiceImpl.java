@@ -101,7 +101,7 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
 
     @Override
     @SentinelResource(value = "doConfirmOrder", blockHandler = "doConfirmOrderBlockHandler")
-    public CommonResp<Void> doConfirmOrder(ConfirmOrderDto confirmOrderDto) {
+    public void doConfirmOrder(ConfirmOrderDto confirmOrderDto) {
         //（省略）数据校验，车次是否存在，车次余票存在，车次是否在有效期内，ticket条数>0，同z同车次同日期不能重复
         /*
          * 获取锁
@@ -126,7 +126,8 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
                 LOG.info("获取锁成功，可以执行购票");
             } else {
                 LOG.error("获取锁失败，有其他消费线程正在处理购票，不做处理");
-                return CommonResp.success(null);
+                CommonResp.success(null);
+                return;
             }
         } catch (InterruptedException e) {
             throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
@@ -163,7 +164,7 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
                 }
             });
         }
-        return CommonResp.success(null);
+        CommonResp.success(null);
     }
 
     @Override
@@ -173,6 +174,44 @@ public class ConfirmOrderServiceImpl implements ConfirmOrderService {
         confirmOrderForUpt.setStatus(confirmOrder.getStatus());
         confirmOrderForUpt.setUpdateTime(DateTime.now());
         confirmOrderMapper.updateByPrimaryKeySelective(confirmOrderForUpt);
+    }
+
+    @Override
+    public CommonResp<Integer> queryLineCount(Long id) {
+        ConfirmOrder confirmOrder = confirmOrderMapper.selectByPrimaryKey(id);
+        //查询订单状态
+        ConfirmOrderStatusEnum status = EnumUtil.getBy(ConfirmOrderStatusEnum::getCode, confirmOrder.getStatus());
+        int result = switch (status) {
+            case PENDING -> 0;
+            case SUCCESS -> -1;
+            case EMPTY -> -2;
+            case FAILURE -> -3;
+            case CANCEL -> -4;
+            case INIT -> 999;
+        };
+
+        if (result == 999) {
+            //查询排队人数
+            ConfirmOrderExample confirmOrderExample = new ConfirmOrderExample();
+            confirmOrderExample
+                    .or()
+                    .andTrainCodeEqualTo(confirmOrder.getTrainCode())
+                    .andDateEqualTo(confirmOrder.getDate())
+                    .andCreateTimeLessThan(confirmOrder.getCreateTime())
+                    .andStatusEqualTo(ConfirmOrderStatusEnum.INIT.getCode());
+            confirmOrderExample.or()
+                    .andTrainCodeEqualTo(confirmOrder.getTrainCode())
+                    .andDateEqualTo(confirmOrder.getDate())
+                    .andCreateTimeEqualTo(confirmOrder.getCreateTime())
+                    .andIdLessThan(confirmOrder.getId())
+                    .andStatusEqualTo(ConfirmOrderStatusEnum.PENDING.getCode());
+
+            long count = confirmOrderMapper.countByExample(confirmOrderExample);
+            return CommonResp.success(Math.toIntExact(count));
+        } else {
+            return CommonResp.success(result);
+        }
+
     }
 
     /**

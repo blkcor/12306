@@ -35,14 +35,21 @@ public interface ConfirmOrderService {
 
     /**
      * 执行确认订单
+     *
      * @param confirmOrderDto 请求参数
-     * @return 返回结果
      */
-    CommonResp<Void> doConfirmOrder(ConfirmOrderDto confirmOrderDto);
+    void doConfirmOrder(ConfirmOrderDto confirmOrderDto);
 
     /**
      * 更新订单状态
-     * @param confirmOrder
+     * @param confirmOrder 请求参数
      */
     void updateStatus(ConfirmOrder confirmOrder);
+
+    /**
+     * 查询排队人数
+     * @param id 订单id
+     * @return 返回结果
+     */
+    CommonResp<Integer> queryLineCount(Long id);
 }

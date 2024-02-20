@@ -17,9 +17,16 @@ import org.springframework.web.bind.annotation.*;
 public class ConfirmOrderController {
     @Resource
     private BeforeConfirmOrderService beforeConfirmOrderService;
+    @Resource
+    private ConfirmOrderService confirmOrderService;
 
     @PostMapping("/do")
     public CommonResp<String> doConfirmOrder(@RequestBody  @Valid ConfirmOrderDoReq confirmOrderSaveReq) {
         return CommonResp.success(beforeConfirmOrderService.beforeDoConfirmOrder(confirmOrderSaveReq));
+    }
+
+    @GetMapping("/query-line-count/{id}")
+    public CommonResp<Integer> queryLineCount(@PathVariable("id") Long id) {
+        return confirmOrderService.queryLineCount(id);
     }
 }
