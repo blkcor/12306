@@ -41,11 +41,12 @@ public class BeforeConfirmOrderServiceImpl implements BeforeConfirmOrderService 
 
     @Value("${spring.profiles.active}")
     private String env;
+
     @SentinelResource(value = "beforeDoConfirmOrder", blockHandler = "beforeDoConfirmOrderBlockHandler")
     @Override
-    public void beforeDoConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq) {
+    public String beforeDoConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq) {
         confirmOrderSaveReq.setMemberId(LoginMemberContext.getId());
-        if(!env.equals("dev")){
+        if (!env.equals("dev")) {
             /*
              * 校验验证码
              */
@@ -93,6 +94,7 @@ public class BeforeConfirmOrderServiceImpl implements BeforeConfirmOrderService 
         LOG.info("发送mq排队购票:{}，开始", message);
         rocketMQTemplate.convertAndSend(RocketMQTopicEnum.CONFIRM_ORDER.getCode(), message);
         LOG.info("发送mq排队购票:{}，结束", message);
+        return String.valueOf(confirmOrder.getId());
     }
 
     /**

@@ -7,5 +7,5 @@ public interface BeforeConfirmOrderService {
     /**
      * 执行确认订单前的操作
      */
-    void beforeDoConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq);
+    String beforeDoConfirmOrder(ConfirmOrderDoReq confirmOrderSaveReq);
 }

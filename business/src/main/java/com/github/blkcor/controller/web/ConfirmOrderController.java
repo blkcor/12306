@@ -19,8 +19,7 @@ public class ConfirmOrderController {
     private BeforeConfirmOrderService beforeConfirmOrderService;
 
     @PostMapping("/do")
-    public CommonResp<Void> doConfirmOrder(@RequestBody  @Valid ConfirmOrderDoReq confirmOrderSaveReq) {
-        beforeConfirmOrderService.beforeDoConfirmOrder(confirmOrderSaveReq);
-        return CommonResp.success(null);
+    public CommonResp<String> doConfirmOrder(@RequestBody  @Valid ConfirmOrderDoReq confirmOrderSaveReq) {
+        return CommonResp.success(beforeConfirmOrderService.beforeDoConfirmOrder(confirmOrderSaveReq));
     }
 }
